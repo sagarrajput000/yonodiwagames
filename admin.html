@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="YonoDiwaGames game directory administration">
+  <title>YonoDiwaGames | Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="Return to YonoDiwaGames home">YONO<span>DIWA</span><small>GAMES</small></a>
+      <div class="admin-label"><span class="pulse" aria-hidden="true"></span> DIRECTORY ADMIN</div>
+    </header>
+
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">GAME DIRECTORY CONTROL</p>
+      <h1 id="page-title">Manage your games</h1>
+      <p>Add, update, organize, or hide ordinary game listings. Changes save directly to Supabase.</p>
+    </section>
+
+    <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+
+    <section class="admin-layout">
+      <aside class="panel editor-panel" aria-labelledby="editor-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">EDITOR</p>
+            <h2 id="editor-title">Add a game</h2>
+          </div>
+          <button id="cancelEdit" class="text-button" type="button" hidden>Cancel edit</button>
+        </div>
+
+        <form id="gameForm" novalidate>
+          <div class="field-grid">
+            <label class="field field-wide">
+              <span>Game name <b>*</b></span>
+              <input id="name" name="name" type="text" maxlength="100" required placeholder="e.g. Sky Quest">
+            </label>
+            <label class="field">
+              <span>Category <b>*</b></span>
+              <select id="category" name="category" required>
+                <option value="yono">Yono Games</option>
+                <option value="diwa">Diwa Games</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Sort order</span>
+              <input id="sort_order" name="sort_order" type="number" min="0" step="1" value="0">
+            </label>
+          </div>
+          <label class="field">
+            <span>Description</span>
+            <textarea id="description" name="description" maxlength="500" rows="4" placeholder="A brief, family-friendly description."></textarea>
+          </label>
+          <label class="field">
+            <span>Image URL</span>
+            <input id="image_url" name="image_url" type="url" placeholder="https://example.com/cover.jpg">
+          </label>
+          <label class="field">
+            <span>Game URL <b>*</b></span>
+            <input id="game_url" name="game_url" type="url" required placeholder="https://example.com/play">
+          </label>
+          <label class="switch-row">
+            <input id="is_active" name="is_active" type="checkbox" checked>
+            <span class="switch" aria-hidden="true"></span>
+            <span><strong>Active listing</strong><small>Visible on the public site</small></span>
+          </label>
+          <button id="saveButton" class="primary-button" type="submit">Save game</button>
+        </form>
+      </aside>
+
+      <section class="panel listings-panel" aria-labelledby="listings-title">
+        <div class="panel-heading list-heading">
+          <div>
+            <p class="eyebrow">DATABASE</p>
+            <h2 id="listings-title">All games <span id="gameCount">0</span></h2>
+          </div>
+          <button id="refreshButton" class="icon-button" type="button" title="Refresh games" aria-label="Refresh games">↻</button>
+        </div>
+        <div class="filters">
+          <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search games"></label>
+          <select id="categoryFilter" aria-label="Filter by category">
+            <option value="all">All categories</option>
+            <option value="yono">Yono Games</option>
+            <option value="diwa">Diwa Games</option>
+          </select>
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+        <div id="gamesList" class="games-list" aria-live="polite"><p class="loading">Loading games…</p></div>
+      </section>
+    </section>
+  </main>
+
+  <template id="gameTemplate">
+    <article class="game-row">
+      <div class="thumb"></div>
+      <div class="game-info"><div class="game-meta"></div><h3></h3><p></p></div>
+      <div class="row-actions"><button class="edit-button" type="button">Edit</button><button class="delete-button" type="button">Delete</button></div>
+    </article>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

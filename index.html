@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>YonoDiwaGames</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<div id="loginScreen" class="login-screen">
+    <div class="login-box">
+        <h1>YonoDiwaGames Admin</h1>
+        <p>Sign in to manage games</p>
+
+        <input
+            type="email"
+            id="adminEmail"
+            placeholder="Admin email"
+        >
+
+        <input
+            type="password"
+            id="adminPassword"
+            placeholder="Password"
+        >
+
+        <button id="loginButton">
+            Login
+        </button>
+
+        <p id="loginMessage"></p>
+    </div>
+</div>
+
+<div id="adminDashboard" style="display:none;">
+
+    <!-- your existing admin panel -->
+
+</div>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+
+        <div class="logo">
+            <span class="logo-icon">🎮</span>
+            <span class="yono">Yono</span><span class="diwa">Diwa</span><span>Games</span>
+        </div>
+
+        <nav class="desktop-nav">
+            <a class="active" href="#">Home</a>
+            <a href="#yono-games">Yono Games</a>
+            <a href="#diwa-games">Diwa Games</a>
+        </nav>
+
+        <button class="menu-button" aria-label="Menu">
+            ☰
+        </button>
+
+    </header>
+
+
+    <!-- HERO -->
+    <main>
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <p class="welcome">
+                    Welcome to
+                </p>
+
+                <h1>
+                    <span>Yono</span><span>Diwa</span>Games
+                </h1>
+
+                <p class="hero-description">
+                    Choose your world. Explore games.
+                    Find your referral links.
+                </p>
+
+            </div>
+
+
+            <!-- TWO MAIN SECTIONS -->
+            <div class="section-choice">
+
+                <!-- YONO -->
+                <button
+                    class="choice-card yono-card"
+                    onclick="openSection('yono-games')"
+                >
+
+                    <div class="choice-icon">
+                        🎮
+                    </div>
+
+                    <div class="choice-text">
+
+                        <h2>
+                            Yono Games
+                        </h2>
+
+                        <p>
+                            Discover the Yono Games
+                            collection and find available
+                            referral links.
+                        </p>
+
+                        <span class="explore">
+                            Explore Yono Games
+                            <b>→</b>
+                        </span>
+
+                    </div>
+
+                </button>
+
+
+                <!-- DIWA -->
+                <button
+                    class="choice-card diwa-card"
+                    onclick="openSection('diwa-games')"
+                >
+
+                    <div class="choice-icon">
+                        🎮
+                    </div>
+
+                    <div class="choice-text">
+
+                        <h2>
+                            Diwa Games
+                        </h2>
+
+                        <p>
+                            Explore the Diwa Games
+                            collection and find available
+                            referral links.
+                        </p>
+
+                        <span class="explore">
+                            Explore Diwa Games
+                            <b>→</b>
+                        </span>
+
+                    </div>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- YONO GAMES -->
+        <section
+            id="yono-games"
+            class="games-section yono-section"
+        >
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-label">COLLECTION</span>
+
+                    <h2>
+                        Yono Games
+                    </h2>
+
+                    <p>
+                        Browse the Yono Games collection.
+                    </p>
+                </div>
+
+                <div class="search-box">
+                    🔍
+                    <input
+                        id="yonoSearch"
+                        type="text"
+                        placeholder="Search Yono Games..."
+                    >
+                </div>
+
+            </div>
+
+
+            <div
+                id="yonoGrid"
+                class="game-grid"
+            ></div>
+
+        </section>
+
+
+        <!-- DIWA GAMES -->
+        <section
+            id="diwa-games"
+            class="games-section diwa-section"
+        >
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-label">COLLECTION</span>
+
+                    <h2>
+                        Diwa Games
+                    </h2>
+
+                    <p>
+                        Browse the Diwa Games collection.
+                    </p>
+                </div>
+
+                <div class="search-box">
+                    🔍
+                    <input
+                        id="diwaSearch"
+                        type="text"
+                        placeholder="Search Diwa Games..."
+                    >
+                </div>
+
+            </div>
+
+
+            <div
+                id="diwaGrid"
+                class="game-grid"
+            ></div>
+
+        </section>
+
+    </main>
+
+
+    <!-- MOBILE NAVIGATION -->
+    <nav class="mobile-nav">
+
+        <a href="#" class="mobile-nav-item active">
+            <span>⌂</span>
+            Home
+        </a>
+
+        <a href="#yono-games" class="mobile-nav-item">
+            <span>🎮</span>
+            Yono
+        </a>
+
+        <a href="#diwa-games" class="mobile-nav-item">
+            <span>🎮</span>
+            Diwa
+        </a>
+
+        <a href="#" class="mobile-nav-item">
+            <span>☰</span>
+            More
+        </a>
+
+    </nav>
+
+
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
