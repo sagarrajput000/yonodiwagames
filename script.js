@@ -256,7 +256,40 @@ function openSection(id) {
     });
 
 }
+// ================= ABOUT SECTION =================
 
+function setupAboutSection() {
+
+    const aboutButton =
+        document.getElementById("aboutButton");
+
+    const aboutSection =
+        document.getElementById("about");
+
+    if (!aboutButton || !aboutSection) {
+        return;
+    }
+
+    aboutButton.addEventListener(
+        "click",
+        function (event) {
+
+            event.preventDefault();
+
+            aboutSection.hidden = false;
+
+            setTimeout(function () {
+
+                aboutSection.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+            }, 50);
+
+        }
+    );
+}
 
 // ================= START WEBSITE =================
 
@@ -267,6 +300,8 @@ document.addEventListener(
         loadGames();
 
         setupSearch();
+
+        setupAboutSection();
 
     }
 );
