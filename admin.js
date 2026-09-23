@@ -3,7 +3,10 @@ const SUPABASE_KEY = "sb_publishable_f3UUErdVfU4o1WPj-FVM4Q_zvA2rr7w";
 
 export function validateGame(game) {
   if (!game.name?.trim()) {
-    return { valid: false, message: "Enter a game name." };
+    return {
+      valid: false,
+      message: "Enter a game name."
+    };
   }
 
   if (!["yono", "diwa"].includes(game.category)) {
@@ -29,18 +32,10 @@ export function validateGame(game) {
     };
   }
 
-  if (game.image_url?.trim()) {
-    try {
-      new URL(game.image_url.trim());
-    } catch {
-      return {
-        valid: false,
-        message: "Enter a valid image URL or leave it blank."
-      };
-    }
-  }
-
-  return { valid: true, message: "" };
+  return {
+    valid: true,
+    message: ""
+  };
 }
 
 export function toGamePayload(game) {
@@ -71,12 +66,18 @@ const app =
         save: document.querySelector("#saveButton"),
         search: document.querySelector("#search"),
         categoryFilter: document.querySelector("#categoryFilter"),
-        statusFilter: document.querySelector("#statusFilter")
+        statusFilter: document.querySelector("#statusFilter"),
+
+        // NEW IMAGE ELEMENTS
+        imageFile: document.querySelector("#image_file"),
+        imagePreview: document.querySelector("#imagePreview"),
+        previewImage: document.querySelector("#previewImage")
       };
 
 let client;
 let games = [];
 let editingId = null;
+let editingImageUrl = null;
 
 /* =========================
    LOGIN SYSTEM
@@ -193,13 +194,13 @@ function createLoginScreen() {
   `;
 
   login.style.position = "fixed";
-login.style.top = "0";
-login.style.left = "0";
-login.style.width = "100%";
-login.style.height = "100%";
-login.style.zIndex = "999999";
+  login.style.top = "0";
+  login.style.left = "0";
+  login.style.width = "100%";
+  login.style.height = "100%";
+  login.style.zIndex = "999999";
 
-document.body.appendChild(login);
+  document.body.appendChild(login);
 
   document
     .querySelector("#loginForm")
@@ -209,19 +210,27 @@ document.body.appendChild(login);
 async function loginAdmin(event) {
   event.preventDefault();
 
-  const email = document.querySelector("#loginEmail").value.trim();
-  const password = document.querySelector("#loginPassword").value;
-  const button = document.querySelector("#loginButton");
-  const errorBox = document.querySelector("#loginError");
+  const email =
+    document.querySelector("#loginEmail").value.trim();
+
+  const password =
+    document.querySelector("#loginPassword").value;
+
+  const button =
+    document.querySelector("#loginButton");
+
+  const errorBox =
+    document.querySelector("#loginError");
 
   button.disabled = true;
   button.textContent = "Logging in...";
   errorBox.style.display = "none";
 
-  const { error } = await client.auth.signInWithPassword({
-    email,
-    password
-  });
+  const { error } =
+    await client.auth.signInWithPassword({
+      email,
+      password
+    });
 
   if (error) {
     errorBox.textContent = error.message;
@@ -229,10 +238,13 @@ async function loginAdmin(event) {
 
     button.disabled = false;
     button.textContent = "Login";
+
     return;
   }
 
-  document.querySelector("#loginScreen")?.remove();
+  document
+    .querySelector("#loginScreen")
+    ?.remove();
 
   initializeAdmin();
 }
@@ -274,10 +286,115 @@ function clearNotice() {
   app.notice.hidden = true;
 }
 
+/* =========================
+   IMAGE PREVIEW
+========================= */
+
+function clearImagePreview() {
+  if (!app.imagePreview || !app.previewImage) return;
+
+  app.previewImage.src = "";
+  app.imagePreview.hidden = true;
+}
+
+function showImagePreview(url) {
+  if (!app.imagePreview || !app.previewImage) return;
+
+  if (!url) {
+    clearImagePreview();
+    return;
+  }
+
+  app.previewImage.src = url;
+  app.imagePreview.hidden = false;
+}
+
+/* =========================
+   IMAGE UPLOAD
+========================= */
+
+async function uploadGameImage(file) {
+  if (!file) {
+    return null;
+  }
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error(
+      "Please choose a JPG, PNG, or WebP image."
+    );
+  }
+
+  const maxSize = 5 * 1024 * 1024;
+
+  if (file.size > maxSize) {
+    throw new Error(
+      "Image must be smaller than 5 MB."
+    );
+  }
+
+  const extension =
+    file.name.split(".").pop().toLowerCase();
+
+  const fileName =
+    `${Date.now()}-${crypto.randomUUID()}.${extension}`;
+
+  const filePath = fileName;
+
+  const {
+    error: uploadError
+  } = await client.storage
+    .from("game-images")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: file.type
+    });
+
+  if (uploadError) {
+    console.error(
+      "Image upload error:",
+      uploadError
+    );
+
+    throw new Error(
+      `Image upload failed: ${uploadError.message}`
+    );
+  }
+
+  const {
+    data
+  } = client.storage
+    .from("game-images")
+    .getPublicUrl(filePath);
+
+  if (!data?.publicUrl) {
+    throw new Error(
+      "Could not create the image URL."
+    );
+  }
+
+  return data.publicUrl;
+}
+
+/* =========================
+   FORM DATA
+========================= */
+
 function currentFormData() {
-  return Object.fromEntries(
-    new FormData(app.form).entries()
-  );
+  return {
+    name: app.form.name.value,
+    category: app.form.category.value,
+    description: app.form.description.value,
+    game_url: app.form.game_url.value,
+    is_active: app.form.is_active.checked,
+    sort_order: app.form.sort_order.value
+  };
 }
 
 function setBusy(busy) {
@@ -309,6 +426,10 @@ function visibleGames() {
   );
 }
 
+/* =========================
+   RENDER GAMES
+========================= */
+
 function renderGames() {
   const shown = visibleGames();
 
@@ -329,11 +450,13 @@ function renderGames() {
         <div class="thumb">
           ${
             game.image_url
-              ? `<img
+              ? `
+                <img
                   src="${escapeHtml(game.image_url)}"
                   alt=""
                   onerror="this.remove()"
-                >`
+                >
+              `
               : escapeHtml(initials(game.name))
           }
         </div>
@@ -392,13 +515,20 @@ function renderGames() {
     .join("");
 }
 
+/* =========================
+   LOAD GAMES
+========================= */
+
 async function loadGames() {
   clearNotice();
 
   app.list.innerHTML =
     '<p class="loading">Loading games…</p>';
 
-  const { data, error } = await client
+  const {
+    data,
+    error
+  } = await client
     .from("games")
     .select("*")
     .order("sort_order", {
@@ -425,8 +555,13 @@ async function loadGames() {
   renderGames();
 }
 
+/* =========================
+   RESET FORM
+========================= */
+
 function resetForm() {
   editingId = null;
+  editingImageUrl = null;
 
   app.form.reset();
 
@@ -436,8 +571,14 @@ function resetForm() {
 
   app.cancel.hidden = true;
 
+  clearImagePreview();
+
   setBusy(false);
 }
+
+/* =========================
+   EDIT GAME
+========================= */
 
 function editGame(id) {
   const game = games.find(
@@ -448,6 +589,9 @@ function editGame(id) {
 
   editingId = id;
 
+  editingImageUrl =
+    game.image_url || null;
+
   app.form.name.value =
     game.name || "";
 
@@ -457,9 +601,6 @@ function editGame(id) {
   app.form.description.value =
     game.description || "";
 
-  app.form.image_url.value =
-    game.image_url || "";
-
   app.form.game_url.value =
     game.game_url || "";
 
@@ -468,6 +609,18 @@ function editGame(id) {
 
   app.form.sort_order.value =
     game.sort_order ?? 0;
+
+  // Clear file input
+  if (app.imageFile) {
+    app.imageFile.value = "";
+  }
+
+  // Show existing image
+  if (editingImageUrl) {
+    showImagePreview(editingImageUrl);
+  } else {
+    clearImagePreview();
+  }
 
   app.title.textContent =
     "Edit game";
@@ -484,6 +637,10 @@ function editGame(id) {
   });
 }
 
+/* =========================
+   DELETE GAME
+========================= */
+
 async function deleteGame(id) {
   const game = games.find(
     item => item.id === id
@@ -498,7 +655,9 @@ async function deleteGame(id) {
     return;
   }
 
-  const { error } = await client
+  const {
+    error
+  } = await client
     .from("games")
     .delete()
     .eq("id", id);
@@ -521,15 +680,16 @@ async function deleteGame(id) {
   await loadGames();
 }
 
+/* =========================
+   SAVE GAME
+========================= */
+
 async function saveGame(event) {
   event.preventDefault();
 
   clearNotice();
 
   const raw = currentFormData();
-
-  raw.is_active =
-    app.form.is_active.checked;
 
   const validation =
     validateGame(raw);
@@ -543,42 +703,135 @@ async function saveGame(event) {
     return;
   }
 
-  const payload =
-    toGamePayload(raw);
-
   setBusy(true);
 
-  const query = editingId
-    ? client
+  try {
+    let imageUrl = editingImageUrl;
+
+    // If a new image was selected, upload it.
+    if (
+      app.imageFile &&
+      app.imageFile.files &&
+      app.imageFile.files.length > 0
+    ) {
+      showNotice(
+        "Uploading image...",
+        "success"
+      );
+
+      imageUrl =
+        await uploadGameImage(
+          app.imageFile.files[0]
+        );
+    }
+
+    const payload =
+      toGamePayload({
+        ...raw,
+        image_url: imageUrl
+      });
+
+    setBusy(true);
+
+    let query;
+
+    if (editingId) {
+      query = client
         .from("games")
         .update(payload)
-        .eq("id", editingId)
-    : client
+        .eq("id", editingId);
+    } else {
+      query = client
         .from("games")
         .insert(payload);
+    }
 
-  const { error } = await query;
+    const {
+      error
+    } = await query;
 
-  setBusy(false);
+    if (error) {
+      throw new Error(
+        `Could not save game: ${error.message}`
+      );
+    }
 
-  if (error) {
     showNotice(
-      `Could not save game: ${error.message}`,
+      editingId
+        ? "Game updated successfully."
+        : "Game added successfully."
+    );
+
+    resetForm();
+
+    await loadGames();
+
+  } catch (error) {
+    console.error(error);
+
+    showNotice(
+      error.message ||
+        "Something went wrong while saving the game.",
       "error"
     );
+
+  } finally {
+    setBusy(false);
+  }
+}
+
+/* =========================
+   IMAGE FILE CHANGE
+========================= */
+
+function handleImageChange() {
+  if (!app.imageFile) return;
+
+  const file =
+    app.imageFile.files[0];
+
+  if (!file) {
+    if (editingImageUrl) {
+      showImagePreview(editingImageUrl);
+    } else {
+      clearImagePreview();
+    }
 
     return;
   }
 
-  showNotice(
-    editingId
-      ? "Game updated successfully."
-      : "Game added successfully."
-  );
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+  ];
 
-  resetForm();
+  if (!allowedTypes.includes(file.type)) {
+    showNotice(
+      "Please choose a JPG, PNG, or WebP image.",
+      "error"
+    );
 
-  await loadGames();
+    app.imageFile.value = "";
+
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    showNotice(
+      "Image must be smaller than 5 MB.",
+      "error"
+    );
+
+    app.imageFile.value = "";
+
+    return;
+  }
+
+  const previewUrl =
+    URL.createObjectURL(file);
+
+  showImagePreview(previewUrl);
 }
 
 /* =========================
@@ -586,26 +839,33 @@ async function saveGame(event) {
 ========================= */
 
 function initializeAdmin() {
-  const logoutButton = document.createElement("button");
+  const logoutButton =
+    document.createElement("button");
 
-logoutButton.textContent = "Logout";
-logoutButton.type = "button";
+  logoutButton.textContent = "Logout";
+  logoutButton.type = "button";
 
-logoutButton.style.position = "fixed";
-logoutButton.style.top = "20px";
-logoutButton.style.right = "20px";
-logoutButton.style.zIndex = "1000";
-logoutButton.style.padding = "10px 16px";
-logoutButton.style.border = "0";
-logoutButton.style.borderRadius = "8px";
-logoutButton.style.background = "#ef4444";
-logoutButton.style.color = "#fff";
-logoutButton.style.cursor = "pointer";
-logoutButton.style.fontWeight = "600";
+  logoutButton.style.position = "fixed";
+  logoutButton.style.top = "20px";
+  logoutButton.style.right = "20px";
+  logoutButton.style.zIndex = "1000";
+  logoutButton.style.padding = "10px 16px";
+  logoutButton.style.border = "0";
+  logoutButton.style.borderRadius = "8px";
+  logoutButton.style.background = "#ef4444";
+  logoutButton.style.color = "#fff";
+  logoutButton.style.cursor = "pointer";
+  logoutButton.style.fontWeight = "600";
 
-logoutButton.addEventListener("click", logoutAdmin);
+  logoutButton.addEventListener(
+    "click",
+    logoutAdmin
+  );
 
-document.body.appendChild(logoutButton);
+  document.body.appendChild(
+    logoutButton
+  );
+
   if (!app?.form) return;
 
   app.form.addEventListener(
@@ -616,6 +876,12 @@ document.body.appendChild(logoutButton);
   app.cancel.addEventListener(
     "click",
     resetForm
+  );
+
+  // Image upload preview
+  app.imageFile?.addEventListener(
+    "change",
+    handleImageChange
   );
 
   document
