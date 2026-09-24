@@ -24,9 +24,7 @@ let diwaGames = [];
 
 
 // ================= CREATE GAME CARD =================
-
 function createGameCard(game) {
-
     const short =
         game.name
             .split(" ")
@@ -35,24 +33,24 @@ function createGameCard(game) {
             .substring(0, 3)
             .toUpperCase();
 
-    return `
-        <article class="game-card">
+    const isUpcoming =
+        game.status === "upcoming" &&
+        game.release_at &&
+        new Date(game.release_at).getTime() > Date.now();
 
-            <div class="game-image">
-                ${game.image_url
-                    ? `<img src="${game.image_url}" alt="${game.name}">`
-                    : `<span>${short}</span>`
-                }
+    let actionButton = "";
+
+    if (isUpcoming) {
+        actionButton = `
+            <div
+                class="countdown-timer"
+                data-release="${game.release_at}"
+            >
+                ⏳ Loading...
             </div>
-
-            <h3>
-                ${escapeHTML(game.name)}
-            </h3>
-
-            <p>
-                ${escapeHTML(game.description || "Explore this game")}
-            </p>
-
+        `;
+    } else if (game.game_url) {
+        actionButton = `
             <a
                 href="${game.game_url}"
                 class="referral-button"
@@ -61,11 +59,35 @@ function createGameCard(game) {
             >
                 🎮 Play Game
             </a>
+        `;
+    } else {
+        actionButton = `
+            <div class="referral-button disabled-button">
+                Coming Soon
+            </div>
+        `;
+    }
 
+    return `
+        <article class="game-card">
+            <div class="game-image">
+                ${
+                    game.image_url
+                        ? `<img src="${game.image_url}" alt="${escapeHTML(game.name)}">`
+                        : `<span>${short}</span>`
+                }
+            </div>
+
+            <h3>${escapeHTML(game.name)}</h3>
+
+            <p>${escapeHTML(
+                game.description || "Explore this game"
+            )}</p>
+
+            ${actionButton}
         </article>
     `;
 }
-
 
 // ================= SECURITY HELPER =================
 
