@@ -392,13 +392,14 @@ function currentFormData() {
   return {
     name: app.form.name.value,
     category: app.form.category.value,
+    status: app.gameStatus.value,
+    release_at: app.releaseAt.value,
     description: app.form.description.value,
     game_url: app.form.game_url.value,
     is_active: app.form.is_active.checked,
     sort_order: app.form.sort_order.value
   };
 }
-
 function setBusy(busy) {
   app.save.disabled = busy;
 
