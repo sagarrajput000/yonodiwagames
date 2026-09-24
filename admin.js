@@ -616,24 +616,18 @@ function editGame(id) {
   editingImageUrl =
     game.image_url || null;
 
-  app.form.name.value =
-    game.name || "";
+  app.form.name.value = game.name || "";
+app.form.category.value = game.category || "yono";
+app.gameStatus.value = game.status || "live";
+app.releaseAt.value = game.release_at
+  ? new Date(game.release_at).toISOString().slice(0, 16)
+  : "";
+app.form.description.value = game.description || "";
+app.form.game_url.value = game.game_url || "";
+app.form.is_active.checked = Boolean(game.is_active);
+app.form.sort_order.value = game.sort_order ?? 0;
 
-  app.form.category.value =
-    game.category || "yono";
-
-  app.form.description.value =
-    game.description || "";
-
-  app.form.game_url.value =
-    game.game_url || "";
-
-  app.form.is_active.checked =
-    Boolean(game.is_active);
-
-  app.form.sort_order.value =
-    game.sort_order ?? 0;
-
+updateUpcomingFields();
   // Clear file input
   if (app.imageFile) {
     app.imageFile.value = "";
