@@ -408,7 +408,24 @@ async function uploadGameImage(file) {
 /* =========================
    FORM DATA
 ========================= */
+function updateUpcomingFields() {
+  if (!app.gameStatus || !app.upcomingFields) {
+    return;
+  }
 
+  const isUpcoming =
+    app.gameStatus.value === "upcoming";
+
+  app.upcomingFields.hidden = !isUpcoming;
+
+  if (app.releaseAt) {
+    app.releaseAt.required = isUpcoming;
+
+    if (!isUpcoming) {
+      app.releaseAt.value = "";
+    }
+  }
+}
 function currentFormData() {
   return {
     name: app.form.name.value,
