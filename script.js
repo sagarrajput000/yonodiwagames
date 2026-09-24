@@ -229,7 +229,7 @@ async function loadGames() {
     );
 }
 startCountdowns();
-}
+
 // ================= SEARCH =================
 
 function setupSearch() {
