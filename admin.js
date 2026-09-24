@@ -590,7 +590,9 @@ function resetForm() {
   app.form.reset();
 
   app.form.is_active.checked = true;
-
+app.gameStatus.value = "live";
+app.releaseAt.value = "";
+updateUpcomingFields();
   app.title.textContent = "Add a game";
 
   app.cancel.hidden = true;
