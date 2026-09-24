@@ -58,9 +58,14 @@ export function toGamePayload(game) {
   return {
     name: game.name.trim(),
     category: game.category,
+    status: game.status,
+    release_at:
+      game.status === "upcoming" && game.release_at
+        ? new Date(game.release_at).toISOString()
+        : null,
     description: game.description?.trim() || "",
     image_url: game.image_url?.trim() || null,
-    game_url: game.game_url.trim(),
+    game_url: game.game_url?.trim() || "",
     is_active: Boolean(game.is_active),
     sort_order: Math.max(
       0,
