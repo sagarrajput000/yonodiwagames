@@ -262,13 +262,14 @@ function setupAboutSection() {
 
     const aboutButton =
         document.getElementById("aboutButton");
-
+const mobileAboutButton =
+    document.getElementById("mobileAboutButton");
     const aboutSection =
         document.getElementById("about");
 
-    if (!aboutButton || !aboutSection) {
-        return;
-    }
+    if (!aboutSection) {
+    return;
+}
 
     aboutButton.addEventListener(
         "click",
