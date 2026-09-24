@@ -510,12 +510,18 @@ function renderGames() {
               ${game.category === "yono" ? "YONO" : "DIWA"}
             </span>
 
-            <span class="badge ${
-              game.is_active ? "" : "inactive"
-            }">
-              ${game.is_active ? "ACTIVE" : "INACTIVE"}
-            </span>
+           
+<span class="badge ${
+  game.status === "upcoming" ? "upcoming" : ""
+}">
+  ${game.status === "upcoming" ? "🟡 UPCOMING" : "🟢 LIVE"}
+</span>
 
+<span class="badge ${
+  game.is_active ? "" : "inactive"
+}">
+  ${game.is_active ? "ACTIVE" : "INACTIVE"}
+</span>
             ORDER ${game.sort_order ?? 0}
 
           </div>
