@@ -67,7 +67,9 @@ const app =
         search: document.querySelector("#search"),
         categoryFilter: document.querySelector("#categoryFilter"),
         statusFilter: document.querySelector("#statusFilter"),
-
+gameStatus: document.querySelector("#status"),
+upcomingFields: document.querySelector("#upcomingFields"),
+releaseAt: document.querySelector("#release_at"),
         // NEW IMAGE ELEMENTS
         imageFile: document.querySelector("#image_file"),
         imagePreview: document.querySelector("#imagePreview"),
