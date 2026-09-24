@@ -145,23 +145,22 @@ function escapeHTML(text) {
 // ================= RENDER GAMES =================
 
 function renderGames(games, container) {
-
     if (!container) return;
 
     if (games.length === 0) {
-
         container.innerHTML = `
             <p class="no-games">
                 No games available.
             </p>
         `;
-
         return;
     }
 
     container.innerHTML = games
         .map(createGameCard)
         .join("");
+
+    setTimeout(startCountdowns, 0);
 }
 
 
