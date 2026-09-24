@@ -8,7 +8,9 @@ export function validateGame(game) {
       message: "Enter a game name."
     };
   }
-
+if (!["live", "upcoming"].includes(game.status)) {
+  return { valid: false, message: "Choose Live or Upcoming." };
+}
   if (!["yono", "diwa"].includes(game.category)) {
     return {
       valid: false,
@@ -16,21 +18,35 @@ export function validateGame(game) {
     };
   }
 
+ if (game.status === "live") {
   if (!game.game_url?.trim()) {
-    return {
-      valid: false,
-      message: "Enter a normal game URL."
-    };
+    return { valid: false, message: "Enter a normal game URL." };
   }
 
   try {
     new URL(game.game_url.trim());
   } catch {
+    return { valid: false, message: "Enter a valid game URL." };
+  }
+}
+
+if (game.status === "upcoming") {
+  if (!game.release_at) {
     return {
       valid: false,
-      message: "Enter a valid game URL."
+      message: "Choose a release date and time for the upcoming game."
     };
   }
+
+  const releaseDate = new Date(game.release_at);
+
+  if (Number.isNaN(releaseDate.getTime())) {
+    return {
+      valid: false,
+      message: "Enter a valid release date and time."
+    };
+  }
+}
 
   return {
     valid: true,
