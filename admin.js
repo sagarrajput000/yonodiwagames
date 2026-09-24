@@ -887,7 +887,12 @@ function initializeAdmin() {
   );
 
   if (!app?.form) return;
+app.gameStatus?.addEventListener(
+  "change",
+  updateUpcomingFields
+);
 
+updateUpcomingFields();
   app.form.addEventListener(
     "submit",
     saveGame
