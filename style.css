@@ -1602,3 +1602,61 @@ body {
     }
 
 }
+/* ================= UPCOMING GAME TIMER ================= */
+
+.countdown-timer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+
+    width: 100%;
+    height: 38px;
+
+    margin-top: 14px;
+    padding: 4px;
+
+    box-sizing: border-box;
+
+    border-radius: 7px;
+
+    background: linear-gradient(
+        180deg,
+        #ffbd00 0%,
+        #f39a00 100%
+    );
+
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.timer-part {
+    flex: 1;
+
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 4px;
+
+    background: #fff4cf;
+
+    color: #7a4b00;
+
+    font-size: 16px;
+    font-weight: 800;
+
+    line-height: 1;
+
+    font-variant-numeric: tabular-nums;
+}
+
+.timer-available {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
