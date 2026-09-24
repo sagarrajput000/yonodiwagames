@@ -94,32 +94,34 @@ function startCountdowns() {
     const timers = document.querySelectorAll(".countdown-timer");
 
     timers.forEach(timer => {
-        const releaseTime =
-            new Date(timer.dataset.release).getTime();
+        const releaseValue = timer.getAttribute("data-release");
+
+        if (!releaseValue) {
+            timer.textContent = "Release date not set";
+            return;
+        }
+
+        const releaseTime = new Date(releaseValue).getTime();
+
+        if (Number.isNaN(releaseTime)) {
+            timer.textContent = "Invalid release date";
+            return;
+        }
 
         function updateTimer() {
-            const now = Date.now();
-            const difference = releaseTime - now;
+            const difference = releaseTime - Date.now();
 
             if (difference <= 0) {
                 timer.textContent = "🎮 Available Now";
                 return;
             }
 
-            const totalSeconds =
-                Math.floor(difference / 1000);
+            const totalSeconds = Math.floor(difference / 1000);
 
-            const days =
-                Math.floor(totalSeconds / 86400);
-
-            const hours =
-                Math.floor((totalSeconds % 86400) / 3600);
-
-            const minutes =
-                Math.floor((totalSeconds % 3600) / 60);
-
-            const seconds =
-                totalSeconds % 60;
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
 
             timer.textContent =
                 `⏳ ${days}d ${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(2, "0")}s`;
