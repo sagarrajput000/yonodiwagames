@@ -90,7 +90,46 @@ function createGameCard(game) {
 }
 
 // ================= SECURITY HELPER =================
+function startCountdowns() {
+    const timers = document.querySelectorAll(".countdown-timer");
 
+    timers.forEach(timer => {
+        const releaseTime =
+            new Date(timer.dataset.release).getTime();
+
+        function updateTimer() {
+            const now = Date.now();
+            const difference = releaseTime - now;
+
+            if (difference <= 0) {
+                timer.textContent = "🎮 Available Now";
+                return;
+            }
+
+            const totalSeconds =
+                Math.floor(difference / 1000);
+
+            const days =
+                Math.floor(totalSeconds / 86400);
+
+            const hours =
+                Math.floor((totalSeconds % 86400) / 3600);
+
+            const minutes =
+                Math.floor((totalSeconds % 3600) / 60);
+
+            const seconds =
+                totalSeconds % 60;
+
+            timer.textContent =
+                `⏳ ${days}d ${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(2, "0")}s`;
+        }
+
+        updateTimer();
+
+        setInterval(updateTimer, 1000);
+    });
+}
 function escapeHTML(text) {
 
     const div = document.createElement("div");
@@ -187,7 +226,7 @@ async function loadGames() {
         diwaGrid
     );
 }
-
+startCountdowns();
 
 // ================= SEARCH =================
 
