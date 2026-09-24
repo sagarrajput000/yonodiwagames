@@ -43,11 +43,14 @@ function createGameCard(game) {
     if (isUpcoming) {
         actionButton = `
             <div
-                class="countdown-timer"
-                data-release="${game.release_at}"
-            >
-                ⏳ Loading...
-            </div>
+    class="countdown-timer"
+    data-release="${game.release_at}"
+>
+    <span class="timer-part timer-days">00</span>
+    <span class="timer-part timer-hours">00</span>
+    <span class="timer-part timer-minutes">00</span>
+    <span class="timer-part timer-seconds">00</span>
+</div>
         `;
     } else if (game.game_url) {
         actionButton = `
