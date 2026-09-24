@@ -257,39 +257,52 @@ function openSection(id) {
 
 }
 // ================= ABOUT SECTION =================
+// ================= ABOUT SECTION =================
 
 function setupAboutSection() {
 
     const aboutButton =
         document.getElementById("aboutButton");
-const mobileAboutButton =
-    document.getElementById("mobileAboutButton");
+
+    const mobileAboutButton =
+        document.getElementById("mobileAboutButton");
+
     const aboutSection =
         document.getElementById("about");
 
     if (!aboutSection) {
-    return;
-}
+        return;
+    }
 
-    aboutButton.addEventListener(
-        "click",
-        function (event) {
+    function showAbout(event) {
 
-            event.preventDefault();
+        event.preventDefault();
 
-            aboutSection.hidden = false;
+        aboutSection.hidden = false;
 
-            setTimeout(function () {
+        setTimeout(function () {
 
-                aboutSection.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
+            aboutSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
 
-            }, 50);
+        }, 50);
+    }
 
-        }
-    );
+    if (aboutButton) {
+        aboutButton.addEventListener(
+            "click",
+            showAbout
+        );
+    }
+
+    if (mobileAboutButton) {
+        mobileAboutButton.addEventListener(
+            "click",
+            showAbout
+        );
+    }
 }
 
 // ================= START WEBSITE =================
