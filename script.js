@@ -98,16 +98,20 @@ function startCountdowns() {
 
     timers.forEach(timer => {
         const releaseValue = timer.getAttribute("data-release");
-
-        if (!releaseValue) {
-            timer.textContent = "Release date not set";
-            return;
-        }
-
         const releaseTime = new Date(releaseValue).getTime();
 
-        if (Number.isNaN(releaseTime)) {
-            timer.textContent = "Invalid release date";
+        const daysElement = timer.querySelector(".timer-days");
+        const hoursElement = timer.querySelector(".timer-hours");
+        const minutesElement = timer.querySelector(".timer-minutes");
+        const secondsElement = timer.querySelector(".timer-seconds");
+
+        if (
+            Number.isNaN(releaseTime) ||
+            !daysElement ||
+            !hoursElement ||
+            !minutesElement ||
+            !secondsElement
+        ) {
             return;
         }
 
@@ -115,7 +119,8 @@ function startCountdowns() {
             const difference = releaseTime - Date.now();
 
             if (difference <= 0) {
-                timer.textContent = "🎮 Available Now";
+                timer.innerHTML =
+                    `<span class="timer-available">PLAY NOW</span>`;
                 return;
             }
 
@@ -126,8 +131,17 @@ function startCountdowns() {
             const minutes = Math.floor((totalSeconds % 3600) / 60);
             const seconds = totalSeconds % 60;
 
-            timer.textContent =
-                `⏳ ${days}d ${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(2, "0")}s`;
+            daysElement.textContent =
+                String(days).padStart(2, "0");
+
+            hoursElement.textContent =
+                String(hours).padStart(2, "0");
+
+            minutesElement.textContent =
+                String(minutes).padStart(2, "0");
+
+            secondsElement.textContent =
+                String(seconds).padStart(2, "0");
         }
 
         updateTimer();
