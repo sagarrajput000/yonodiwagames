@@ -83,6 +83,21 @@
             <span>Game URL <b>*</b></span>
             <input id="game_url" name="game_url" type="url" required placeholder="https://example.com/play">
           </label>
+          <div id="upcomingFields" hidden>
+
+    <label class="field">
+        <span>Release date & time <b>*</b></span>
+        <input
+            id="release_at"
+            name="release_at"
+            type="datetime-local"
+        >
+        <small class="field-help">
+            Set when this game will become available.
+        </small>
+    </label>
+
+</div>
           <label class="switch-row">
             <input id="is_active" name="is_active" type="checkbox" checked>
             <span class="switch" aria-hidden="true"></span>
