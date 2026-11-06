@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All games — Yono and Diwa directory | YonoDiwaGames</title>
+    <meta name="description" content="Browse every Yono and Diwa game in the YonoDiwaGames directory. Filter by collection, search by name and sort by editor score, newest or A–Z.">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="data.js" defer></script>
+    <script src="app.js" defer></script>
+</head>
+<body data-page="games">
+<div data-site-header></div>
+
+<main>
+    <section class="page-hero">
+        <div class="wrap">
+            <nav class="crumbs" aria-label="Breadcrumb">
+                <a href="index.html">Home</a><span>/</span><span>Games</span>
+            </nav>
+            <h1>All games in the directory</h1>
+            <p>Every active listing, with editor scores and live status. Open a game to see its details, or follow the Play link to go straight to the operator.</p>
+        </div>
+    </section>
+
+    <section class="section" style="padding-top:8px">
+        <div class="wrap" id="search">
+            <div class="filter-bar">
+                <div class="chip-group" role="group" aria-label="Filter by collection">
+                    <button class="chip is-active" type="button" data-filter="all">All games</button>
+                    <button class="chip" type="button" data-filter="yono">Yono</button>
+                    <button class="chip" type="button" data-filter="diwa">Diwa</button>
+                    <button class="chip" type="button" data-filter="upcoming">Upcoming</button>
+                </div>
+                <label class="filter-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+                    <span class="sr-only">Search games</span>
+                    <input id="search" type="search" placeholder="Search games" autocomplete="off">
+                </label>
+                <label class="sr-only" for="sort">Sort games</label>
+                <select class="select" id="sort">
+                    <option value="default">Directory order</option>
+                    <option value="rating">Highest score</option>
+                    <option value="newest">Newest first</option>
+                    <option value="name">Name A–Z</option>
+                </select>
+            </div>
+
+            <p class="result-count" id="resultCount"></p>
+            <div class="card-grid" id="gamesGrid">
+                <p class="loading">Loading games</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="wrap">
+            <div class="cta-band">
+                <div>
+                    <h2>Can't find the game you were looking for?</h2>
+                    <p>Send us the name and the link. Listings are reviewed manually and added when the link checks out.</p>
+                </div>
+                <a class="btn btn-ghost btn-lg" href="complaints.html#complaint-form">Suggest a game</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div data-site-footer></div>
+<nav class="tabbar" data-tabbar aria-label="Quick navigation"></nav>
+</body>
+</html>

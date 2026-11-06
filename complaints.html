@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game complaint service — YonoDiwaGames</title>
+    <meta name="description" content="File a free complaint about a Yono or Diwa game listing. Read the guide, send the details and we will contact the operator and follow up for 14 days.">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="data.js" defer></script>
+    <script src="app.js" defer></script>
+</head>
+<body data-page="complaints">
+<div data-site-header></div>
+
+<main>
+    <section class="page-hero">
+        <div class="wrap">
+            <nav class="crumbs" aria-label="Breadcrumb">
+                <a href="index.html">Home</a><span>/</span><span>Complaints</span>
+            </nav>
+            <h1>Game complaint service</h1>
+            <p>Withdrawals stuck, a bonus that never arrived, or a link that leads nowhere? Tell us what happened. The service is free, and every case is recorded.</p>
+        </div>
+    </section>
+
+    <section class="section" style="padding-top:26px">
+        <div class="wrap">
+            <div class="card-grid">
+                <div class="panel">
+                    <span class="pill pill--cat">Step 1</span>
+                    <h3 style="margin-top:12px">Contact the operator first</h3>
+                    <p style="color:var(--muted);font-size:13.5px;line-height:1.7">Open the app's own help centre and raise a ticket from your registered account. Note the ticket number — we cannot move a case forward without it.</p>
+                </div>
+                <div class="panel">
+                    <span class="pill pill--cat">Step 2</span>
+                    <h3 style="margin-top:12px">Collect your evidence</h3>
+                    <p style="color:var(--muted);font-size:13.5px;line-height:1.7">Screenshots of the transaction, your balance, the offer you accepted and any chat with support. Dates and times make the case much easier to follow.</p>
+                </div>
+                <div class="panel">
+                    <span class="pill pill--cat">Step 3</span>
+                    <h3 style="margin-top:12px">Send it to us</h3>
+                    <p style="color:var(--muted);font-size:13.5px;line-height:1.7">Use the form below. We acknowledge within two working days, contact the operator through our channel and follow up for up to 14 days.</p>
+                </div>
+            </div>
+
+            <div class="detail-grid" style="margin-top:34px">
+                <div class="panel" id="complaint-form">
+                    <h2>File a complaint</h2>
+                    <p style="color:var(--muted);font-size:13.5px;margin:-6px 0 20px">Fields marked * are required. Submitting opens your email app with the details filled in, so you keep a copy of what you sent.</p>
+
+                    <form id="complaintForm">
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>Your name</span>
+                                <input name="name" type="text" maxlength="80" placeholder="Full name" autocomplete="name">
+                            </label>
+                            <label class="field">
+                                <span>Email *</span>
+                                <input name="email" type="email" required placeholder="you@example.com" autocomplete="email">
+                            </label>
+                            <label class="field">
+                                <span>Game name *</span>
+                                <input name="game" type="text" required maxlength="80" placeholder="e.g. DIWA X">
+                            </label>
+                            <label class="field">
+                                <span>Issue type *</span>
+                                <select name="issue" required>
+                                    <option value="">Choose an issue</option>
+                                    <option>Withdrawal delay</option>
+                                    <option>Deposit not credited</option>
+                                    <option>Bonus or promo problem</option>
+                                    <option>Account access</option>
+                                    <option>Broken or unsafe link</option>
+                                    <option>Suggest a new listing</option>
+                                </select>
+                            </label>
+                            <label class="field field--full">
+                                <span>What happened? *</span>
+                                <textarea name="details" required minlength="20" maxlength="2000" placeholder="Dates, amounts, ticket number and what you have already tried."></textarea>
+                                <small>At least 20 characters. Do not include passwords or OTPs.</small>
+                            </label>
+                        </div>
+                        <button class="btn btn-primary btn-block" type="submit" style="margin-top:16px">Send complaint</button>
+                        <div class="form-message" id="formMessage" role="status" aria-live="polite"></div>
+                        <p class="form-note">Prefer email? Write to <a href="mailto:support@yonodiwagames.online" style="color:var(--green)">support@yonodiwagames.online</a>. We never ask for account passwords or one-time codes.</p>
+                    </form>
+                </div>
+
+                <aside>
+                    <div class="panel">
+                        <h3>What happens next</h3>
+                        <dl class="spec-list">
+                            <div><dt>Acknowledgement</dt><dd>Within 2 working days</dd></div>
+                            <div><dt>Operator contact</dt><dd>Within 3 working days</dd></div>
+                            <div><dt>Follow-up window</dt><dd>Up to 14 days</dd></div>
+                            <div><dt>Cost</dt><dd>Free</dd></div>
+                        </dl>
+                    </div>
+                    <div class="panel">
+                        <h3>Before you write</h3>
+                        <p style="color:var(--muted);font-size:13.5px;line-height:1.7">
+                            Keep the message factual: what happened, when, what you want resolved. Threats or abusive messages close tickets faster than they open them.
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="wrap">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Answers</span>
+                    <h2>Complaint FAQ</h2>
+                </div>
+            </div>
+            <div class="faq" id="faqList"></div>
+        </div>
+    </section>
+</main>
+
+<div data-site-footer></div>
+<nav class="tabbar" data-tabbar aria-label="Quick navigation"></nav>
+</body>
+</html>

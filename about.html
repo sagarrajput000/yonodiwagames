@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About the directory — YonoDiwaGames</title>
+    <meta name="description" content="Who runs YonoDiwaGames, how listings are scored, how complaints are handled and how to contact the team behind the directory.">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="data.js" defer></script>
+    <script src="app.js" defer></script>
+</head>
+<body data-page="about">
+<div data-site-header></div>
+
+<main>
+    <section class="page-hero">
+        <div class="wrap">
+            <nav class="crumbs" aria-label="Breadcrumb">
+                <a href="index.html">Home</a><span>/</span><span>About</span>
+            </nav>
+            <h1>About YonoDiwaGames</h1>
+            <p>A small, independently maintained directory for Yono and Diwa style gaming apps — built so you can compare listings before you open one.</p>
+        </div>
+    </section>
+
+    <section class="section" style="padding-top:26px">
+        <div class="wrap">
+            <div class="stat-grid" id="aboutStats" style="margin-bottom:34px">
+                <div class="panel"><h3>—</h3><p>Games tracked</p></div>
+                <div class="panel"><h3>—</h3><p>Yono games</p></div>
+                <div class="panel"><h3>—</h3><p>Diwa games</p></div>
+                <div class="panel"><h3>—</h3><p>Years checking links</p></div>
+            </div>
+
+            <div class="detail-grid">
+                <div>
+                    <div class="panel">
+                        <h2>Why this directory exists</h2>
+                        <div class="prose">
+                            <p>New Yono and Diwa apps appear every week. Most lists you find online are either out of date or built only to push a link. YonoDiwaGames keeps one clean page per game: what it is, where it links, whether it is live and what score it earned.</p>
+                            <p>The directory is maintained by hand. Listings are added from a private admin panel, reviewed before they go public, and removed when a link stops resolving.</p>
+                        </div>
+                    </div>
+
+                    <div class="panel" id="methodology">
+                        <h2>How we score games</h2>
+                        <div class="prose">
+                            <p>Every listing carries an editor score out of 10. The number is a shortlisting aid, not a promise about payouts.</p>
+                            <ul>
+                                <li><strong>Listing quality</strong> — clear name, artwork, description and a valid referral link.</li>
+                                <li><strong>Link stability</strong> — how reliably the link opens on mobile and desktop.</li>
+                                <li><strong>Complaint history</strong> — what visitors report and how quickly the operator responds.</li>
+                                <li><strong>Freshness</strong> — whether offers and details are kept up to date.</li>
+                            </ul>
+                            <p>We do not accept payment for a score. A game cannot buy a higher position in the directory.</p>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <h2>Complaints, honestly</h2>
+                        <div class="prose">
+                            <p>We are a directory, not a regulator. We cannot freeze an account, release a withdrawal or force an operator to pay. What we can do is document the case, pass it to the operator contact we hold and follow up for up to 14 days.</p>
+                            <p>If your case needs legal or regulatory action, contact the licensing authority named in the operator's own terms.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <aside>
+                    <div class="panel" id="contact">
+                        <h2>Contact</h2>
+                        <div class="prose" style="font-size:13.5px">
+                            <p>Questions, corrections, new listings or complaints — one inbox handles everything.</p>
+                        </div>
+                        <dl class="spec-list" style="margin-top:8px">
+                            <div><dt>Email</dt><dd><a href="mailto:support@yonodiwagames.online" style="color:var(--green)">support@yonodiwagames.online</a></dd></div>
+                            <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/sagar_rajput_2678" target="_blank" rel="noopener noreferrer" style="color:var(--green)">@sagar_rajput_2678</a></dd></div>
+                            <div><dt>Developer</dt><dd>Sagar</dd></div>
+                            <div><dt>Response time</dt><dd>2 working days</dd></div>
+                        </dl>
+                        <a class="btn btn-primary btn-block" style="margin-top:16px" href="complaints.html#complaint-form">File a complaint</a>
+                    </div>
+
+                    <div class="panel">
+                        <h3>Site updates</h3>
+                        <p style="color:var(--muted);font-size:13.5px;line-height:1.7;margin-bottom:14px">Release notes, new listings and score changes are posted in the news section.</p>
+                        <a class="btn btn-ghost btn-block btn-sm" href="news.html">Read the news</a>
+                    </div>
+
+                    <div class="note" style="margin-top:16px">
+                        <strong>18+ only.</strong> Online gaming involves financial risk. Play only where it is legal, and only with money you can afford to lose.
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div data-site-footer></div>
+<nav class="tabbar" data-tabbar aria-label="Quick navigation"></nav>
+</body>
+</html>

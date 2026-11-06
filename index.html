@@ -3,110 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YonoDiwaGames - Explore Yono & Diwa Games</title>
-    <meta name="description" content="Explore Yono and Diwa games on YonoDiwaGames. Discover new and upcoming games, browse game categories, and find your next game to play.">
+    <title>YonoDiwaGames — Yono and Diwa game directory with editor scores</title>
+    <meta name="description" content="Compare Yono and Diwa games in one directory. Editor scores, live and upcoming listings, bonuses, news and a free complaint service. 18+.">
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
-    <style>
-        .logo > img { width: 46px; height: 46px; object-fit: contain; flex: 0 0 auto; margin-right: 9px; }
-        @media (max-width: 800px) { .logo > img { width: 38px; height: 38px; margin-right: 7px; } }
-
-        /* Mobile-only About and countdown refinements. Desktop styles remain unchanged. */
-        @media (max-width: 768px) {
-            .about-section { padding: 28px 20px 86px; overflow: hidden; }
-            .about-card { width: 100%; min-height: 0; display: grid; grid-template-columns: 1fr; gap: 24px; padding: 30px 20px 34px; border-radius: 22px; box-sizing: border-box; }
-            .about-left { width: 100%; max-width: none; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
-            .about-badge { margin-bottom: 18px; padding: 8px 18px; font-size: 12px; letter-spacing: 2px; }
-            .about-left h2 { max-width: 100%; font-size: clamp(34px, 10vw, 52px); line-height: 1; letter-spacing: -1.5px; overflow-wrap: anywhere; }
-            .about-description { max-width: 100%; margin: 18px 0 20px; font-size: 15px; line-height: 1.55; overflow-wrap: anywhere; }
-            .developer-card { width: 100%; max-width: none; box-sizing: border-box; justify-content: center; gap: 14px; padding: 14px 16px; margin: 0 0 18px; text-align: left; }
-            .instagram-button { width: 100%; max-width: 250px; min-height: 0; flex-direction: column; justify-content: center; gap: 7px; padding: 12px 16px; text-align: center; }
-            .instagram-icon { width: 42px; height: 42px; font-size: 0; }
-            .instagram-icon svg { width: 24px; height: 24px; }
-            .instagram-arrow { display: none; }
-            .about-right { width: 100%; min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; overflow: visible; }
-            .about-right .controller-glow, .about-right .controller-circle, .about-right .controller, .about-right .shape { transform: scale(.62); transform-origin: center; }
-            .about-right .controller-glow, .about-right .controller-circle, .about-right .controller { margin: -38px 0; }
-            .about-slogan { position: static; order: 10; margin: 4px 0 0; text-align: center; line-height: 1.15; }
-            .countdown-timer { width: 100%; max-width: 232px; min-width: 0; margin: 12px auto 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; align-items: stretch; justify-content: center; box-sizing: border-box; overflow: hidden; }
-            .countdown-timer .timer-part { min-width: 0; min-height: 43px; padding: 5px 2px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-sizing: border-box; border: 1px solid rgba(255,174,0,.65); border-radius: 6px; background: rgba(91,48,0,.42); color: #ffd34e; font-size: clamp(14px,4vw,18px); font-weight: 800; line-height: 1; overflow: hidden; }
-            .countdown-timer .timer-part::after { display: block; margin-top: 4px; color: #ffb52e; font-size: 7px; font-weight: 700; letter-spacing: .35px; line-height: 1; }
-            .countdown-timer .timer-days::after { content: "DAYS"; }
-            .countdown-timer .timer-hours::after { content: "HOURS"; }
-            .countdown-timer .timer-minutes::after { content: "MIN"; }
-            .countdown-timer .timer-seconds::after { content: "SEC"; }
-            .countdown-timer .timer-available { display: block; width: 100%; padding: 11px 6px; box-sizing: border-box; color: #171005; font-size: 12px; font-weight: 900; text-align: center; border-radius: 7px; background: #ffb52e; }
-        }
-        @media (max-width: 360px) {
-            .about-section { padding-left: 20px; padding-right: 20px; }
-            .about-card { padding-left: 14px; padding-right: 14px; }
-            .countdown-timer { max-width: 220px; gap: 3px; }
-            .countdown-timer .timer-part { min-height: 41px; padding-left: 1px; padding-right: 1px; }
-            .countdown-timer .timer-part::after { font-size: 6px; letter-spacing: 0; }
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="data.js" defer></script>
+    <script src="app.js" defer></script>
 </head>
-<body>
-<header class="header">
-    <div class="logo" aria-label="YonoDiwaGames Logo">
-        <img src="logo.png" alt="YonoDiwaGames Logo">
-        <div class="brand-text" aria-label="YonoDiwaGames title">
-            <span class="yono">Yono</span><span class="diwa">Diwa</span><span class="games">Games</span>
-        </div>
-    </div>
-    <nav class="desktop-nav">
-        <a class="active" href="#">Home</a><a href="#yono-games">Yono Games</a><a href="#diwa-games">Diwa Games</a><a href="#about" id="aboutButton">About</a>
-    </nav>
-    <button class="menu-button" aria-label="Menu">☰</button>
-</header>
+<body data-page="home">
+<div data-site-header></div>
+
 <main>
-<section class="hero">
-    <div class="hero-content"><p class="welcome">Welcome to</p><h1><span>Yono</span><span>Diwa</span>Games</h1><p class="hero-description">Choose your world. Explore games.<br>Find your referral link and start playing.</p></div>
-    <div class="section-choice">
-        <button class="choice-card yono-card" onclick="openSection('yono-games')"><div class="choice-icon">🎮</div><div class="choice-text"><h2>Yono Games</h2><p>Discover the Yono Games collection.</p><span class="explore">Explore <b>→</b></span></div></button>
-        <button class="choice-card diwa-card" onclick="openSection('diwa-games')"><div class="choice-icon">🎮</div><div class="choice-text"><h2>Diwa Games</h2><p>Explore the Diwa Games collection.</p><span class="explore">Explore <b>→</b></span></div></button>
-    </div>
-</section>
-<section id="yono-games" class="games-section yono-section">
-    <div class="section-heading"><div><span class="section-label">COLLECTION</span><h2>Yono Games</h2><p>Browse the Yono Games collection.</p></div><div class="search-box">🔍<input id="yonoSearch" type="text" placeholder="Search Yono Games..."></div></div>
-    <div id="yonoGrid" class="game-grid"></div>
-</section>
-<section id="diwa-games" class="games-section diwa-section">
-    <div class="section-heading"><div><span class="section-label">COLLECTION</span><h2>Diwa Games</h2><p>Browse the Diwa Games collection.</p></div><div class="search-box">🔍<input id="diwaSearch" type="text" placeholder="Search Diwa Games..."></div></div>
-    <div id="diwaGrid" class="game-grid"></div>
-</section>
-</main>
-<nav class="mobile-nav">
-    <a href="#about" class="mobile-nav-item" id="mobileAboutButton">
-        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.25" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M5.5 19.25c.8-3.15 3.05-4.75 6.5-4.75s5.7 1.6 6.5 4.75" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></span>
-        <span>About</span>
-    </a>
-    <a href="#yono-games" class="mobile-nav-item">
-        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7.5 8.5h9a4 4 0 0 1 3.75 5.4l-1.15 3.15a2.35 2.35 0 0 1-4.05.65L13.35 16h-2.7l-1.7 1.7a2.35 2.35 0 0 1-4.05-.65l-1.15-3.15A4 4 0 0 1 7.5 8.5Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M8 11v4M6 13h4M16.5 12.25h.01M18 14h.01" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></span>
-        <span>Yono</span>
-    </a>
-    <a href="#diwa-games" class="mobile-nav-item">
-        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7.5 8.5h9a4 4 0 0 1 3.75 5.4l-1.15 3.15a2.35 2.35 0 0 1-4.05.65L13.35 16h-2.7l-1.7 1.7a2.35 2.35 0 0 1-4.05-.65l-1.15-3.15A4 4 0 0 1 7.5 8.5Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M8 11v4M6 13h4M16.5 12.25h.01M18 14h.01" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></span>
-        <span>Diwa</span>
-    </a>
-    <a href="#" class="mobile-nav-item">
-        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></span>
-        <span>More</span>
-    </a>
-</nav>
-<section class="about-section" id="about" hidden>
-    <div class="about-card">
-        <div class="about-left">
-            <div class="about-badge"><span>🎮</span>ABOUT</div>
-            <h2>About<br><span>YonoDiwaGames</span></h2>
-            <p class="about-description">YonoDiwaGames is a simple game directory where you can discover and explore different games in one place. Play, enjoy and find your next favorite game!</p>
-            <div class="developer-card"><div class="developer-icon"><span>👤</span></div><div><small>DEVELOPER</small><strong>Sagar</strong></div></div>
-            <a href="https://www.instagram.com/sagar_rajput_2678?stkn=a2hnYjZpZXlyeXk=" class="instagram-button" target="_blank" rel="noopener noreferrer"><span class="instagram-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></span><span>Follow on Instagram</span><span class="instagram-arrow">→</span></a>
+    <section class="hero">
+        <div class="wrap hero-inner">
+            <span class="eyebrow">Independent game directory</span>
+            <h1>Find your game.<br>Then <span class="accent">play</span>.</h1>
+            <p class="lead">
+                Editor scores, live status and referral links for Yono and Diwa style gaming apps — checked,
+                organised and kept in one place so you can compare before you commit.
+            </p>
+
+            <form class="hero-search" id="heroSearch" role="search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+                <label class="sr-only" for="heroSearchInput">Search games</label>
+                <input id="heroSearchInput" type="search" placeholder="Search by game name, e.g. Diwa X" autocomplete="off">
+                <button class="btn btn-primary btn-sm" type="submit">Search</button>
+            </form>
+
+            <div class="hero-stats" id="heroStats">
+                <div><strong>—</strong><span>Games listed</span></div>
+                <div><strong>—</strong><span>Yono games</span></div>
+                <div><strong>—</strong><span>Diwa games</span></div>
+                <div><strong>—</strong><span>Coming soon</span></div>
+            </div>
         </div>
-        <div class="about-right"><div class="controller-glow"></div><div class="controller-circle"></div><div class="controller"><div class="controller-top"></div><div class="controller-body"><div class="dpad"><span></span><span></span><span></span><span></span></div><div class="controller-center"><span></span><span></span></div><div class="buttons"><span>△</span><span>○</span><span>×</span><span>□</span></div></div></div><span class="shape shape-one">△</span><span class="shape shape-two">□</span><span class="shape shape-three">×</span><span class="shape shape-four">○</span><div class="about-slogan"><span>Play More</span><br><strong>Explore More</strong></div></div>
-    </div>
-</section>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js"></script>
+    </section>
+
+    <section class="section section--tight">
+        <div class="wrap">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Top picks</span>
+                    <h2>Highest rated this week</h2>
+                    <p>Our three strongest listings right now, based on listing quality, link stability and complaint history.</p>
+                </div>
+                <a class="view-all" href="casinos.html">All games →</a>
+            </div>
+            <div class="spotlight" id="spotlight">
+                <div class="spot-card"><span class="spot-rank">Loading</span><h3>—</h3><p>Fetching the latest listings.</p></div>
+                <div class="spot-card"><span class="spot-rank">Loading</span><h3>—</h3><p>Fetching the latest listings.</p></div>
+                <div class="spot-card"><span class="spot-rank">Loading</span><h3>—</h3><p>Fetching the latest listings.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="wrap">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Directory</span>
+                    <h2>New on YonoDiwaGames</h2>
+                    <p>Filter by collection and see which links are live today.</p>
+                </div>
+            </div>
+
+            <div class="tabs" id="homeTabs" role="tablist" aria-label="Game filters">
+                <button class="tab is-active" type="button" data-filter="all" role="tab">All games</button>
+                <button class="tab" type="button" data-filter="yono" role="tab">Yono games</button>
+                <button class="tab" type="button" data-filter="diwa" role="tab">Diwa games</button>
+                <button class="tab" type="button" data-filter="upcoming" role="tab">Upcoming</button>
+            </div>
+
+            <div class="card-grid" id="homeGrid">
+                <p class="loading">Loading games</p>
+            </div>
+
+            <div style="text-align:center;margin-top:28px">
+                <a class="btn btn-ghost" href="casinos.html">Browse all games →</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="wrap">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">News</span>
+                    <h2>Latest from the directory</h2>
+                    <p>Guides, link safety checks and updates on what is being added next.</p>
+                </div>
+                <a class="view-all" href="news.html">All news →</a>
+            </div>
+            <div class="card-grid card-grid--wide" id="homeNews"></div>
+        </div>
+    </section>
+
+    <section class="section section--tight">
+        <div class="wrap">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Bonuses</span>
+                    <h2>Offers worth checking</h2>
+                    <p>Promotions listed by operators. Terms, codes and eligibility are always set by the app.</p>
+                </div>
+                <a class="view-all" href="bonuses.html">All bonuses →</a>
+            </div>
+            <div class="card-grid" id="homeBonuses"></div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="wrap">
+            <div class="cta-band">
+                <div>
+                    <h2>Something went wrong with a game?</h2>
+                    <p>Use the complaint service. We record the case, contact the operator through our channel and follow up for up to 14 days — free of charge.</p>
+                </div>
+                <a class="btn btn-primary btn-lg" href="complaints.html">File a complaint</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div data-site-footer></div>
+<nav class="tabbar" data-tabbar aria-label="Quick navigation"></nav>
 </body>
 </html>
