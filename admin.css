@@ -37,3 +37,11 @@ button { cursor:pointer; }
   height: 100%;
   object-fit: cover;
 }
+
+/* ---------------------------------------------------------- promo codes admin */
+.promo-admin { margin-top: 26px; }
+.promo-help { margin: 0 0 18px; padding: 12px 14px; border: 1px dashed #ffc84a66; border-radius: 10px; background: #ffc84a12; color: #ffe6ae; font-size: 13px; line-height: 1.55; }
+.promo-help code { padding: 1px 5px; border-radius: 4px; background: #ffffff14; font-size: 12px; }
+#promoForm { padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid var(--line); }
+#promoCancel { margin-left: 12px; }
+#promoCodesList .thumb { font-size: 10px; letter-spacing: .5px; }

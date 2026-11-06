@@ -131,6 +131,57 @@
         <div id="gamesList" class="games-list" aria-live="polite"><p class="loading">Loading games…</p></div>
       </section>
     </section>
+
+    <section class="panel promo-admin" aria-labelledby="promo-title">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">PROMO CODES</p>
+          <h2 id="promo-title">Daily promo codes <span id="promoCount">0</span></h2>
+        </div>
+        <button id="refreshPromos" class="icon-button" type="button" title="Refresh promo codes" aria-label="Refresh promo codes">&#8635;</button>
+      </div>
+      <p class="promo-help" id="promoHelp" hidden></p>
+      <div id="promoNotice" class="notice" role="status" aria-live="polite" hidden></div>
+
+      <form id="promoForm" novalidate>
+        <div class="field-grid">
+          <label class="field field-wide">
+            <span>Promo code <b>*</b></span>
+            <input id="promo_code" type="text" maxlength="60" required placeholder="e.g. DIWA100">
+          </label>
+          <label class="field">
+            <span>Game</span>
+            <select id="promo_game"><option value="">Not linked</option></select>
+          </label>
+          <label class="field">
+            <span>Expires at</span>
+            <input id="promo_expires" type="datetime-local">
+          </label>
+          <label class="field">
+            <span>Sort order</span>
+            <input id="promo_sort" type="number" min="0" step="1" value="0">
+          </label>
+        </div>
+        <label class="field">
+          <span>Note shown on the site</span>
+          <textarea id="promo_note" rows="2" maxlength="200" placeholder="e.g. New users only. Minimum deposit required."></textarea>
+        </label>
+        <label class="field">
+          <span>Claim link (optional)</span>
+          <input id="promo_link" type="url" placeholder="https://example.com/play">
+          <small class="field-help">Leave empty to send visitors to the linked game page instead.</small>
+        </label>
+        <label class="switch-row">
+          <input id="promo_active" type="checkbox" checked>
+          <span class="switch" aria-hidden="true"></span>
+          <span><strong>Show on the site</strong><small>Uncheck to hide it without deleting</small></span>
+        </label>
+        <button id="promoSave" class="primary-button" type="submit">Add promo code</button>
+        <button id="promoCancel" class="text-button" type="button" hidden>Cancel edit</button>
+      </form>
+
+      <div id="promoCodesList" class="games-list" aria-live="polite"><p class="loading">Loading promo codes...</p></div>
+    </section>
   </main>
 
   <template id="gameTemplate">

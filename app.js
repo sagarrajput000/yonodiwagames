@@ -20,6 +20,10 @@ function escapeHTML(value = "") {
     return node.innerHTML;
 }
 
+function escapeAttr(value = "") {
+    return escapeHTML(value).replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
 function initials(name = "Game") {
     return (
         name
@@ -106,6 +110,7 @@ const NAV = [
             { label: "Upcoming releases", href: "casinos.html?status=upcoming" }
         ]
     },
+    { key: "promo-codes", label: "Promo codes", href: "promo-codes.html" },
     { key: "bonuses", label: "Bonuses", href: "bonuses.html" },
     { key: "news", label: "News", href: "news.html" },
     { key: "complaints", label: "Complaints", href: "complaints.html" },
@@ -158,6 +163,7 @@ function footerMarkup() {
                     </div>
                     <div class="foot-col">
                         <h4>Discover</h4>
+                        <a href="promo-codes.html">Daily promo codes</a>
                         <a href="bonuses.html">Bonuses and codes</a>
                         <a href="news.html">News and updates</a>
                         <a href="complaints.html">Complaint service</a>
@@ -227,6 +233,7 @@ function renderChrome() {
                     <a href="casinos.html?cat=diwa">Diwa games</a>
                     <a href="casinos.html?status=upcoming">Upcoming releases</a>
                     <span class="drawer-label">More</span>
+                    <a href="promo-codes.html" class="${active === "promo-codes" ? "is-active" : ""}">Promo codes</a>
                     <a href="bonuses.html" class="${active === "bonuses" ? "is-active" : ""}">Bonuses</a>
                     <a href="news.html" class="${active === "news" ? "is-active" : ""}">News</a>
                     <a href="complaints.html" class="${active === "complaints" ? "is-active" : ""}">Complaints</a>
@@ -243,6 +250,7 @@ function renderChrome() {
         const items = [
             { key: "home", label: "Home", href: "index.html", icon: '<path d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/>' },
             { key: "games", label: "Games", href: "casinos.html", icon: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M8 12h8M12 8v8"/>' },
+            { key: "promo-codes", label: "Codes", href: "promo-codes.html", icon: '<path d="M4 7h16v4a2 2 0 0 0 0 2v4H4v-4a2 2 0 0 0 0-2z"/><path d="M12 7v10"/>' },
             { key: "bonuses", label: "Bonuses", href: "bonuses.html", icon: '<path d="M4 10v9a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-9"/><path d="M3 6h18v4H3zM12 6v14"/>' },
             { key: "news", label: "News", href: "news.html", icon: '<path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/>' }
         ];
@@ -300,6 +308,33 @@ async function getGames() {
         })();
     }
     return gamesPromise;
+}
+
+let promosPromise = null;
+
+async function getPromoCodes() {
+    if (!promosPromise) {
+        promosPromise = (async () => {
+            if (!window.supabase) return [];
+            const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            const { data, error } = await client
+                .from("promo_codes")
+                .select("*")
+                .eq("is_active", true)
+                .order("sort_order", { ascending: true })
+                .order("created_at", { ascending: false });
+            if (error) {
+                // The table is created with supabase/promo_codes.sql; stay quiet until then.
+                console.warn("Promo codes unavailable:", error.message);
+                return [];
+            }
+            return data || [];
+        })().catch(error => {
+            console.warn("Promo codes unavailable:", error.message);
+            return [];
+        });
+    }
+    return promosPromise;
 }
 
 /* ------------------------------------------------------------------ cards */
@@ -416,6 +451,116 @@ function bonusCard(bonus, games) {
         </article>`;
 }
 
+/* ------------------------------------------------------------- promo codes */
+
+function promoExpired(promo) {
+    if (!promo.expires_at) return false;
+    const expiry = new Date(promo.expires_at).getTime();
+    return !Number.isNaN(expiry) && expiry <= Date.now();
+}
+
+function promoGame(promo) {
+    if (promo.game_id) {
+        const byId = allGames.find(game => game.id === promo.game_id);
+        if (byId) return byId;
+    }
+    const name = String(promo.game_name || "").toLowerCase();
+    return allGames.find(game => game.name.toLowerCase() === name) || null;
+}
+
+function promoExpiryLabel(promo) {
+    if (!promo.expires_at) return "No expiry listed";
+    const expiry = new Date(promo.expires_at).getTime();
+    if (Number.isNaN(expiry)) return "No expiry listed";
+    const diff = expiry - Date.now();
+    if (diff <= 0) return "Expired";
+    const minutes = Math.floor(diff / 60000);
+    const days = Math.floor(minutes / 1440);
+    const hours = Math.floor((minutes % 1440) / 60);
+    if (days > 0) return `Ends in ${days}d ${hours}h`;
+    if (hours > 0) return `Ends in ${hours}h ${minutes % 60}m`;
+    return `Ends in ${Math.max(minutes, 1)}m`;
+}
+
+function promoCard(promo) {
+    const expired = promoExpired(promo);
+    const game = promoGame(promo);
+    const title = promo.game_name || (game ? game.name : "Promo code");
+    const href = game ? gameHref(game) : promo.link ? promo.link : "casinos.html";
+    const external = !game && Boolean(promo.link);
+    const cta = external
+        ? `<a class="btn btn-primary btn-sm" href="${escapeAttr(promo.link)}" target="_blank" rel="noopener noreferrer sponsored">Claim</a>`
+        : `<a class="btn btn-primary btn-sm" href="${href}">${game ? "View game" : "Browse games"}</a>`;
+
+    return `
+        <article class="promo-card${expired ? " is-expired" : ""}">
+            <div class="promo-head">
+                <span class="promo-game">${escapeHTML(title)}</span>
+                <span class="promo-state">${expired ? "Expired" : promo.expires_at ? "Limited" : "Live"}</span>
+            </div>
+            <button class="promo-code" type="button" data-copy="${escapeAttr(promo.code)}" ${expired ? "disabled" : ""} aria-label="Copy code ${escapeAttr(promo.code)}">
+                <span class="promo-code-text">${escapeHTML(promo.code)}</span>
+                <span class="promo-copy">${expired ? "Ended" : "Copy"}</span>
+            </button>
+            ${promo.note ? `<p class="promo-note">${escapeHTML(promo.note)}</p>` : ""}
+            <div class="promo-foot">
+                <span class="promo-expiry" data-expiry="${escapeAttr(promo.expires_at || "")}">${promoExpiryLabel(promo)}</span>
+                ${cta}
+            </div>
+        </article>`;
+}
+
+function startPromoTimers(scope = document) {
+    scope.querySelectorAll("[data-expiry]").forEach(node => {
+        if (node.dataset.started === "1") return;
+        node.dataset.started = "1";
+        const card = node.closest(".promo-card");
+        const update = () => {
+            const label = promoExpiryLabel({ expires_at: node.dataset.expiry });
+            node.textContent = label;
+            if (label === "Expired" && card) card.classList.add("is-expired");
+        };
+        update();
+        setInterval(update, 30000);
+    });
+}
+
+function flashCopied(button) {
+    const label = button.querySelector(".promo-copy");
+    const original = label ? label.textContent : "";
+    button.classList.add("is-copied");
+    if (label) label.textContent = "Copied";
+    setTimeout(() => {
+        button.classList.remove("is-copied");
+        if (label) label.textContent = original;
+    }, 1800);
+}
+
+async function copyText(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        return true;
+    } catch {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.select();
+        const copied = document.execCommand("copy");
+        area.remove();
+        return copied;
+    }
+}
+
+document.addEventListener("click", async event => {
+    const button = event.target.closest("[data-copy]");
+    if (!button) return;
+    const ok = await copyText(button.dataset.copy || "");
+    if (ok) flashCopied(button);
+});
+
 /* -------------------------------------------------------------- countdowns */
 
 function startCountdowns(scope = document) {
@@ -515,6 +660,15 @@ async function initHome() {
     }
     if (bonusGrid) {
         bonusGrid.innerHTML = (window.SITE_BONUSES || []).slice(0, 3).map(bonus => bonusCard(bonus, games)).join("");
+    }
+
+    const promoGrid = document.getElementById("homePromos");
+    if (promoGrid) {
+        const codes = await getPromoCodes();
+        promoGrid.innerHTML = codes.length
+            ? codes.slice(0, 3).map(promoCard).join("")
+            : '<p class="empty">No promo codes are live right now. New codes are posted here daily — check back soon.</p>';
+        startPromoTimers(promoGrid);
     }
 
     const searchForm = document.getElementById("heroSearch");
@@ -826,6 +980,30 @@ async function initBonusesPage() {
         : '<p class="empty">No bonuses listed right now.</p>';
 }
 
+/* -------------------------------------------------------------- promo codes */
+
+async function initPromoCodesPage() {
+    const grid = document.getElementById("promoGrid");
+    const count = document.getElementById("promoCount");
+    if (!grid) return;
+
+    await getGames().catch(() => []);
+    const codes = await getPromoCodes();
+    const live = codes.filter(promo => !promoExpired(promo));
+
+    if (count) count.textContent = String(live.length);
+
+    grid.innerHTML = codes.length
+        ? codes.map(promoCard).join("")
+        : `<div class="empty-state">
+                <h3>No promo codes are live right now</h3>
+                <p>New codes are added from the admin panel every day. Check the bonuses page in the meantime, or come back shortly.</p>
+                <a class="btn btn-primary btn-sm" href="bonuses.html">Browse bonuses</a>
+           </div>`;
+
+    startPromoTimers(grid);
+}
+
 /* -------------------------------------------------------------- complaints */
 
 function initComplaintsPage() {
@@ -902,6 +1080,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         else if (page === "bonuses") await initBonusesPage();
         else if (page === "news") initNewsList();
         else if (page === "news-detail") initNewsDetail();
+        else if (page === "promo-codes") await initPromoCodesPage();
         else if (page === "complaints") initComplaintsPage();
         else if (page === "about") await initAboutPage();
     } catch (error) {

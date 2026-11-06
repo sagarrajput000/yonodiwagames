@@ -600,6 +600,7 @@ async function loadGames() {
   games = data || [];
 
   renderGames();
+  fillPromoGameOptions();
 }
 
 /* =========================
@@ -969,6 +970,317 @@ updateUpcomingFields();
   );
 
   loadGames();
+  initPromoCodesAdmin();
+}
+
+/* =========================
+   PROMO CODES
+========================= */
+
+const promoUI = {
+  form: document.querySelector("#promoForm"),
+  list: document.querySelector("#promoCodesList"),
+  count: document.querySelector("#promoCount"),
+  notice: document.querySelector("#promoNotice"),
+  help: document.querySelector("#promoHelp"),
+  code: document.querySelector("#promo_code"),
+  game: document.querySelector("#promo_game"),
+  note: document.querySelector("#promo_note"),
+  link: document.querySelector("#promo_link"),
+  expires: document.querySelector("#promo_expires"),
+  sort: document.querySelector("#promo_sort"),
+  active: document.querySelector("#promo_active"),
+  save: document.querySelector("#promoSave"),
+  cancel: document.querySelector("#promoCancel"),
+  refresh: document.querySelector("#refreshPromos")
+};
+
+let promos = [];
+let editingPromoId = null;
+
+function promoNotice(message, type = "success") {
+  if (!promoUI.notice) return;
+
+  promoUI.notice.textContent = message;
+  promoUI.notice.className = `notice ${type}`;
+  promoUI.notice.hidden = false;
+}
+
+function promoIsExpired(promo) {
+  if (!promo.expires_at) return false;
+
+  const expiry = new Date(promo.expires_at).getTime();
+
+  return !Number.isNaN(expiry) && expiry <= Date.now();
+}
+
+function fillPromoGameOptions() {
+  if (!promoUI.game) return;
+
+  const current = promoUI.game.value;
+
+  promoUI.game.innerHTML =
+    '<option value="">Not linked</option>' +
+    games
+      .map(
+        game =>
+          `<option value="${game.id}">${escapeHtml(game.name)}</option>`
+      )
+      .join("");
+
+  promoUI.game.value = current;
+}
+
+function resetPromoForm() {
+  if (!promoUI.form) return;
+
+  editingPromoId = null;
+  promoUI.form.reset();
+  promoUI.active.checked = true;
+  promoUI.sort.value = 0;
+  promoUI.save.textContent = "Add promo code";
+  promoUI.cancel.hidden = true;
+}
+
+function setPromoBusy(busy) {
+  if (!promoUI.save) return;
+
+  promoUI.save.disabled = busy;
+  promoUI.save.textContent = busy
+    ? "Saving..."
+    : editingPromoId
+      ? "Update promo code"
+      : "Add promo code";
+}
+
+function renderPromoCodes() {
+  if (!promoUI.list) return;
+
+  if (promoUI.count) {
+    promoUI.count.textContent = promos.length;
+  }
+
+  if (!promos.length) {
+    promoUI.list.innerHTML =
+      '<p class="empty">No promo codes yet. Add the first one above.</p>';
+
+    return;
+  }
+
+  promoUI.list.innerHTML = promos
+    .map(
+      promo => `
+      <article class="game-row">
+        <div class="thumb">${escapeHtml(promo.code.slice(0, 6).toUpperCase())}</div>
+        <div class="game-info">
+          <div class="game-meta">
+            <span class="badge">${promo.is_active ? "ACTIVE" : "HIDDEN"}</span>
+            ${
+              promoIsExpired(promo)
+                ? '<span class="badge inactive">EXPIRED</span>'
+                : ""
+            }
+            ${escapeHtml(promo.game_name || "No game linked")}
+          </div>
+          <h3>${escapeHtml(promo.code)}</h3>
+          <p>${
+            promo.note
+              ? escapeHtml(promo.note)
+              : promo.expires_at
+                ? "Expires " + new Date(promo.expires_at).toLocaleString()
+                : "No note"
+          }</p>
+        </div>
+        <div class="row-actions">
+          <button class="edit-button" type="button" data-promo-edit="${promo.id}">Edit</button>
+          <button class="delete-button" type="button" data-promo-delete="${promo.id}">Delete</button>
+        </div>
+      </article>`
+    )
+    .join("");
+}
+
+async function loadPromoCodes() {
+  if (!client || !promoUI.list) return;
+
+  promoUI.list.innerHTML = '<p class="loading">Loading promo codes...</p>';
+
+  const { data, error } = await client
+    .from("promo_codes")
+    .select("*")
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    const missing =
+      error.code === "PGRST205" ||
+      /could not find the table/i.test(error.message || "");
+
+    promos = [];
+    renderPromoCodes();
+
+    promoUI.list.innerHTML =
+      '<p class="empty">Promo codes could not be loaded.</p>';
+
+    if (promoUI.help) {
+      promoUI.help.hidden = false;
+      promoUI.help.innerHTML = missing
+        ? "The <strong>promo_codes</strong> table does not exist yet. Open Supabase, go to SQL Editor, run the file <code>supabase/promo_codes.sql</code> from this project, then press refresh."
+        : `Could not load promo codes: ${escapeHtml(error.message)}`;
+    }
+
+    return;
+  }
+
+  if (promoUI.help) promoUI.help.hidden = true;
+
+  promos = data || [];
+  renderPromoCodes();
+}
+
+function editPromo(id) {
+  const promo = promos.find(item => item.id === id);
+
+  if (!promo || !promoUI.form) return;
+
+  editingPromoId = id;
+  promoUI.code.value = promo.code || "";
+  promoUI.game.value = promo.game_id || "";
+  promoUI.note.value = promo.note || "";
+  promoUI.link.value = promo.link || "";
+  promoUI.expires.value = promo.expires_at
+    ? new Date(promo.expires_at).toISOString().slice(0, 16)
+    : "";
+  promoUI.sort.value = promo.sort_order ?? 0;
+  promoUI.active.checked = Boolean(promo.is_active);
+  promoUI.save.textContent = "Update promo code";
+  promoUI.cancel.hidden = false;
+  promoUI.code.focus();
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function deletePromo(id) {
+  const promo = promos.find(item => item.id === id);
+
+  if (
+    !promo ||
+    !window.confirm(`Delete the code "${promo.code}"? This cannot be undone.`)
+  ) {
+    return;
+  }
+
+  const { error } = await client
+    .from("promo_codes")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    promoNotice(`Could not delete the code: ${error.message}`, "error");
+    return;
+  }
+
+  promoNotice("Promo code deleted.");
+
+  if (editingPromoId === id) resetPromoForm();
+
+  await loadPromoCodes();
+}
+
+async function savePromoCode(event) {
+  event.preventDefault();
+
+  if (!client || !promoUI.form) return;
+
+  const code = promoUI.code.value.trim();
+
+  if (!code) {
+    promoNotice("Enter the promo code text.", "error");
+    return;
+  }
+
+  const link = promoUI.link.value.trim();
+
+  if (link) {
+    try {
+      new URL(link);
+    } catch {
+      promoNotice("Enter a valid claim link or leave it empty.", "error");
+      return;
+    }
+  }
+
+  let expiresAt = null;
+
+  if (promoUI.expires.value) {
+    const parsed = new Date(promoUI.expires.value);
+
+    if (Number.isNaN(parsed.getTime())) {
+      promoNotice("Enter a valid expiry date.", "error");
+      return;
+    }
+
+    expiresAt = parsed.toISOString();
+  }
+
+  const payload = {
+    code,
+    game_id: promoUI.game.value || null,
+    game_name: promoUI.game.value
+      ? promoUI.game.selectedOptions[0].textContent
+      : null,
+    note: promoUI.note.value.trim() || null,
+    link: link || null,
+    expires_at: expiresAt,
+    is_active: promoUI.active.checked,
+    sort_order: Math.max(0, Number.parseInt(promoUI.sort.value, 10) || 0)
+  };
+
+  setPromoBusy(true);
+
+  try {
+    const query = editingPromoId
+      ? client.from("promo_codes").update(payload).eq("id", editingPromoId)
+      : client.from("promo_codes").insert(payload);
+
+    const { error } = await query;
+
+    if (error) throw new Error(error.message);
+
+    promoNotice(
+      editingPromoId
+        ? "Promo code updated."
+        : "Promo code added and live on the site."
+    );
+
+    resetPromoForm();
+    await loadPromoCodes();
+  } catch (error) {
+    promoNotice(
+      `Could not save the promo code: ${error.message}`,
+      "error"
+    );
+  } finally {
+    setPromoBusy(false);
+  }
+}
+
+function initPromoCodesAdmin() {
+  if (!promoUI.form) return;
+
+  promoUI.form.addEventListener("submit", savePromoCode);
+  promoUI.cancel?.addEventListener("click", resetPromoForm);
+  promoUI.refresh?.addEventListener("click", loadPromoCodes);
+
+  promoUI.list?.addEventListener("click", event => {
+    const editId = event.target.dataset.promoEdit;
+    const deleteId = event.target.dataset.promoDelete;
+
+    if (editId) editPromo(editId);
+    if (deleteId) deletePromo(deleteId);
+  });
+
+  loadPromoCodes();
 }
 
 /* =========================
