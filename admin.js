@@ -152,6 +152,7 @@ function createLoginScreen() {
           <input
             id="loginEmail"
             type="email"
+            autocomplete="email"
             placeholder="Admin email"
             required
             style="
@@ -169,6 +170,7 @@ function createLoginScreen() {
           <input
             id="loginPassword"
             type="password"
+            autocomplete="current-password"
             placeholder="Password"
             required
             style="
