@@ -3,13 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YonoDiwaGames — Yono and Diwa game directory with editor scores</title>
-    <meta name="description" content="Compare Yono and Diwa games in one directory. Editor scores, live and upcoming listings, daily promo codes, bonuses, news and a free complaint service. 18+.">
+    <title>Yono Game — New, All &amp; Upcoming Yono Games | YonoDiwaGames</title>
+    <meta name="description" content="Looking for a new Yono game? Browse all Yono games, upcoming Yono game releases, editor scores and verified links in one independent directory. 18+.">
+    <link rel="canonical" href="https://www.yonodiwagames.online/">
+    <meta name="robots" content="index,follow,max-image-preview:large">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="YonoDiwaGames">
+    <meta property="og:title" content="Yono Game — New, All &amp; Upcoming Yono Games">
+    <meta property="og:description" content="Browse new Yono games, all Yono games and upcoming Yono game releases in one independent directory.">
+    <meta property="og:url" content="https://www.yonodiwagames.online/">
+    <meta property="og:image" content="https://www.yonodiwagames.online/logo.png">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css?v=20261110">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="data.js" defer></script>
     <script src="app.js?v=20261110" defer></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://www.yonodiwagames.online/#website",
+          "url": "https://www.yonodiwagames.online/",
+          "name": "YonoDiwaGames",
+          "inLanguage": "en-IN",
+          "description": "Independent directory for new, all and upcoming Yono games.",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://www.yonodiwagames.online/casinos.html?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://www.yonodiwagames.online/#yono-faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is a Yono game?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "A Yono game is a Yono-style gaming app listed in this independent directory. We do not operate the games; every Play link opens the operator's own website or app."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Where can I find new Yono games?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The new Yono games shortcut opens the Yono collection sorted newest first. New listings are added after their link and details are checked."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Are upcoming Yono games playable?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Not until their release time. An upcoming Yono game shows a countdown on its card and detail page, then switches to a normal Play link when the timer ends."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 </head>
 <body data-page="home">
 <div data-site-header></div>
@@ -17,11 +76,11 @@
 <main>
     <section class="hero">
         <div class="wrap hero-inner">
-            <span class="eyebrow">India's trusted game directory</span>
-            <h1>Find your game.<br>Then <span class="accent">play</span> safe.</h1>
+            <span class="eyebrow">India's independent Yono game directory</span>
+            <h1>Every Yono game.<br>One <span class="accent">safe</span> place.</h1>
             <p class="lead">
-                Editor scores, live status and verified referral links for Yono and Diwa style gaming apps —
-                checked, organised and kept in one place so you can compare before you commit.
+                Compare new Yono games, every Yono game in the directory and upcoming Yono game releases.
+                Editor scores, live status and verified referral links — checked, organised and kept in one place.
             </p>
 
             <form class="hero-search" id="heroSearch" role="search">
@@ -113,15 +172,15 @@
         <div class="wrap">
             <div class="section-head">
                 <div>
-                    <span class="eyebrow">Directory</span>
-                    <h2>New on YonoDiwaGames</h2>
-                    <p>Filter by collection and see which links are live today.</p>
+                    <span class="eyebrow">Yono game directory</span>
+                    <h2>New Yono games &amp; the full directory</h2>
+                    <p>Browse new Yono games, all Yono games in the collection, Diwa listings and upcoming releases. Filter by collection and see which links are live today.</p>
                 </div>
             </div>
 
             <div class="tabs" id="homeTabs" role="tablist" aria-label="Game filters">
                 <button class="tab is-active" type="button" data-filter="all" role="tab">All games</button>
-                <button class="tab" type="button" data-filter="yono" role="tab">Yono games</button>
+                <button class="tab" type="button" data-filter="yono" role="tab">All Yono games</button>
                 <button class="tab" type="button" data-filter="diwa" role="tab">Diwa games</button>
                 <button class="tab" type="button" data-filter="upcoming" role="tab">Upcoming</button>
             </div>
@@ -132,6 +191,61 @@
 
             <div style="text-align:center;margin-top:28px">
                 <a class="btn btn-ghost" href="casinos.html">Browse all games →</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--tight" id="yono-games-guide">
+        <div class="wrap">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Yono game guide</span>
+                    <h2>New Yono games, all Yono games and upcoming releases</h2>
+                    <p>Looking for a new Yono game, the full list, or something releasing soon? Start with the three shortcuts below, then open any listing for its editor score, live status and safety notes.</p>
+                </div>
+                <a class="view-all" href="casinos.html?cat=yono">All Yono games →</a>
+            </div>
+            <div class="card-grid card-grid--wide">
+                <article class="panel" style="margin-top:0">
+                    <h3>New Yono game</h3>
+                    <p style="color:var(--muted);font-size:13.5px">Recently added Yono games, sorted newest first. Every new listing is checked for a working link before it appears.</p>
+                    <a class="view-all" href="casinos.html?cat=yono&amp;sort=newest">See new Yono games →</a>
+                </article>
+                <article class="panel" style="margin-top:0">
+                    <h3>All Yono games</h3>
+                    <p style="color:var(--muted);font-size:13.5px">The full Yono game list in one place. Filter by collection, search by name and sort by editor score or A–Z.</p>
+                    <a class="view-all" href="casinos.html?cat=yono">Browse all Yono games →</a>
+                </article>
+                <article class="panel" style="margin-top:0">
+                    <h3>Upcoming Yono game</h3>
+                    <p style="color:var(--muted);font-size:13.5px">Announced games that are not live yet. Each upcoming listing shows a countdown until its release time.</p>
+                    <a class="view-all" href="casinos.html?status=upcoming">See upcoming releases →</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--tight" id="yono-faq">
+        <div class="wrap">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Yono game FAQ</span>
+                    <h2>Common questions about Yono games</h2>
+                </div>
+            </div>
+            <div class="faq-list" style="display:grid;gap:10px">
+                <details class="faq-item">
+                    <summary>What is a Yono game?</summary>
+                    <p>A Yono game is a Yono-style gaming app listed in this independent directory. We do not operate the games; every Play link opens the operator's own website or app.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Where can I find new Yono games?</summary>
+                    <p>The new Yono games shortcut opens the Yono collection sorted newest first. New listings are added after their link and details are checked.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Are upcoming Yono games playable?</summary>
+                    <p>Not until their release time. An upcoming Yono game shows a countdown on its card and detail page, then switches to a normal Play link when the timer ends.</p>
+                </details>
             </div>
         </div>
     </section>

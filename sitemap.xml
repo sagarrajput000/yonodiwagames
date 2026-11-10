@@ -2,43 +2,45 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://yonodiwagames.online/</loc>
+    <loc>https://www.yonodiwagames.online/</loc>
+    <lastmod>2026-11-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://yonodiwagames.online/casinos.html</loc>
+    <loc>https://www.yonodiwagames.online/casinos.html</loc>
+    <lastmod>2026-11-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://yonodiwagames.online/promo-codes.html</loc>
+    <loc>https://www.yonodiwagames.online/promo-codes.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://yonodiwagames.online/bonuses.html</loc>
+    <loc>https://www.yonodiwagames.online/bonuses.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://yonodiwagames.online/news.html</loc>
+    <loc>https://www.yonodiwagames.online/news.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://yonodiwagames.online/complaints.html</loc>
+    <loc>https://www.yonodiwagames.online/complaints.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://yonodiwagames.online/about.html</loc>
+    <loc>https://www.yonodiwagames.online/about.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
