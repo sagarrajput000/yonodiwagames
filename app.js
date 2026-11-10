@@ -198,18 +198,6 @@ function renderChrome() {
 
     if (headerSlot) {
         headerSlot.innerHTML = `
-            <div class="top-strip">
-                <div class="wrap">
-                    <span><b>18+</b> only · Play responsibly</span>
-                    <span class="strip-right">
-                        <span>Daily promo codes &amp; vouchers</span>
-                        <span class="dot" aria-hidden="true"></span>
-                        <a href="complaints.html">Complaint support</a>
-                        <span class="dot" aria-hidden="true"></span>
-                        <a href="mailto:${SITE.email}">${SITE.email}</a>
-                    </span>
-                </div>
-            </div>
             <header class="site-header">
                 <div class="header-inner">
                     <a class="brand" href="index.html" aria-label="${SITE.name} home">
