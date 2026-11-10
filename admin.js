@@ -452,19 +452,28 @@ function visibleGames() {
   const query = app.search.value
     .trim()
     .toLowerCase();
+  const status = app.statusFilter.value;
 
-  return games.filter(
-    game =>
-      (!query ||
-        `${game.name} ${game.description || ""}`
-          .toLowerCase()
-          .includes(query)) &&
-      (app.categoryFilter.value === "all" ||
-        game.category === app.categoryFilter.value) &&
-      (app.statusFilter.value === "all" ||
-        (app.statusFilter.value === "active") ===
-          game.is_active)
-  );
+  return games.filter(game => {
+    const matchesQuery =
+      !query ||
+      `${game.name} ${game.description || ""}`
+        .toLowerCase()
+        .includes(query);
+
+    const matchesCategory =
+      app.categoryFilter.value === "all" ||
+      game.category === app.categoryFilter.value;
+
+    const matchesStatus =
+      status === "all" ||
+      (status === "active" && game.is_active) ||
+      (status === "inactive" && !game.is_active) ||
+      (status === "live" && game.status !== "upcoming") ||
+      (status === "upcoming" && game.status === "upcoming");
+
+    return matchesQuery && matchesCategory && matchesStatus;
+  });
 }
 
 /* =========================
@@ -475,6 +484,7 @@ function renderGames() {
   const shown = visibleGames();
 
   app.count.textContent = games.length;
+  updateStats();
 
   if (!shown.length) {
     app.list.innerHTML =
@@ -510,7 +520,7 @@ function renderGames() {
               ${game.category === "yono" ? "YONO" : "DIWA"}
             </span>
 
-           
+
 <span class="badge ${
   game.status === "upcoming" ? "upcoming" : ""
 }">
@@ -537,6 +547,24 @@ function renderGames() {
         </div>
 
         <div class="row-actions">
+
+          <button
+            class="toggle-button"
+            type="button"
+            data-toggle="${game.id}"
+            title="${game.is_active ? "Hide from the site" : "Show on the site"}"
+          >
+            ${game.is_active ? "Hide" : "Show"}
+          </button>
+
+          <button
+            class="duplicate-button"
+            type="button"
+            data-duplicate="${game.id}"
+            title="Duplicate this listing"
+          >
+            Duplicate
+          </button>
 
           <button
             class="edit-button"
@@ -725,6 +753,70 @@ async function deleteGame(id) {
 }
 
 /* =========================
+   QUICK ACTIONS
+========================= */
+
+function updateStats() {
+  const set = (id, value) => {
+    const node = document.getElementById(id);
+    if (node) node.textContent = String(value);
+  };
+
+  const visiblePromos = promos.filter(
+    promo => promo.is_active && !promoIsExpired(promo)
+  );
+
+  set("statGames", games.length);
+  set("statLive", games.filter(game => game.is_active).length);
+  set(
+    "statUpcoming",
+    games.filter(game => game.status === "upcoming").length
+  );
+  set("statPromos", promos.length);
+  set("statPromosActive", visiblePromos.length);
+}
+
+async function toggleGame(id) {
+  const game = games.find(item => item.id === id);
+  if (!game) return;
+
+  const next = !game.is_active;
+
+  const { error } = await client
+    .from("games")
+    .update({ is_active: next })
+    .eq("id", id);
+
+  if (error) {
+    showNotice(`Could not update the game: ${error.message}`, "error");
+    return;
+  }
+
+  showNotice(next ? "Game is now visible on the site." : "Game hidden from the site.");
+  await loadGames();
+}
+
+async function duplicateGame(id) {
+  const game = games.find(item => item.id === id);
+  if (!game) return;
+
+  const payload = toGamePayload(game);
+  payload.name = `${game.name} copy`;
+  payload.is_active = false;
+  payload.sort_order = (Number(game.sort_order) || 0) + 1;
+
+  const { error } = await client.from("games").insert(payload);
+
+  if (error) {
+    showNotice(`Could not duplicate the game: ${error.message}`, "error");
+    return;
+  }
+
+  showNotice("Game duplicated as an inactive listing.");
+  await loadGames();
+}
+
+/* =========================
    SAVE GAME
 ========================= */
 
@@ -896,7 +988,8 @@ function initializeAdmin() {
   logoutButton.style.padding = "10px 16px";
   logoutButton.style.border = "0";
   logoutButton.style.borderRadius = "8px";
-  logoutButton.style.background = "#ef4444";
+  logoutButton.style.background = "#1a5ce5";
+  logoutButton.style.boxShadow = "0 6px 16px rgba(26,92,229,.22)";
   logoutButton.style.color = "#fff";
   logoutButton.style.cursor = "pointer";
   logoutButton.style.fontWeight = "600";
@@ -956,16 +1049,15 @@ updateUpcomingFields();
     event => {
       const {
         edit,
-        delete: deleted
+        delete: deleted,
+        toggle,
+        duplicate
       } = event.target.dataset;
 
-      if (edit) {
-        editGame(edit);
-      }
-
-      if (deleted) {
-        deleteGame(deleted);
-      }
+      if (edit) editGame(edit);
+      if (deleted) deleteGame(deleted);
+      if (toggle) toggleGame(toggle);
+      if (duplicate) duplicateGame(duplicate);
     }
   );
 
@@ -984,7 +1076,10 @@ const promoUI = {
   notice: document.querySelector("#promoNotice"),
   help: document.querySelector("#promoHelp"),
   code: document.querySelector("#promo_code"),
+  type: document.querySelector("#promo_type"),
   game: document.querySelector("#promo_game"),
+  site: document.querySelector("#promo_site"),
+  download: document.querySelector("#promo_download"),
   note: document.querySelector("#promo_note"),
   link: document.querySelector("#promo_link"),
   expires: document.querySelector("#promo_expires"),
@@ -992,7 +1087,10 @@ const promoUI = {
   active: document.querySelector("#promo_active"),
   save: document.querySelector("#promoSave"),
   cancel: document.querySelector("#promoCancel"),
-  refresh: document.querySelector("#refreshPromos")
+  refresh: document.querySelector("#refreshPromos"),
+  search: document.querySelector("#promoSearch"),
+  typeFilter: document.querySelector("#promoTypeFilter"),
+  stateFilter: document.querySelector("#promoStateFilter")
 };
 
 let promos = [];
@@ -1038,6 +1136,7 @@ function resetPromoForm() {
   promoUI.form.reset();
   promoUI.active.checked = true;
   promoUI.sort.value = 0;
+  if (promoUI.type) promoUI.type.value = "code";
   promoUI.save.textContent = "Add promo code";
   promoUI.cancel.hidden = true;
 }
@@ -1053,12 +1152,44 @@ function setPromoBusy(busy) {
       : "Add promo code";
 }
 
+function promoTypeLabelAdmin(promo) {
+  const type = promo.promo_type || "code";
+  if (type === "deposit") return "DEPOSIT VOUCHER";
+  if (type === "freegame") return "FREE GAME VOUCHER";
+  return "PROMOCODE";
+}
+
+function visiblePromos() {
+  const query = (promoUI.search?.value || "").trim().toLowerCase();
+  const type = promoUI.typeFilter?.value || "all";
+  const state = promoUI.stateFilter?.value || "all";
+
+  return promos.filter(promo => {
+    const haystack =
+      `${promo.code} ${promo.game_name || ""} ${promo.site_name || ""} ${promo.note || ""}`.toLowerCase();
+    const matchesQuery = !query || haystack.includes(query);
+    const matchesType = type === "all" || (promo.promo_type || "code") === type;
+    const expired = promoIsExpired(promo);
+    const matchesState =
+      state === "all" ||
+      (state === "active" && promo.is_active && !expired) ||
+      (state === "hidden" && !promo.is_active) ||
+      (state === "expired" && expired);
+
+    return matchesQuery && matchesType && matchesState;
+  });
+}
+
 function renderPromoCodes() {
   if (!promoUI.list) return;
 
   if (promoUI.count) {
     promoUI.count.textContent = promos.length;
   }
+
+  updateStats();
+
+  const shown = visiblePromos();
 
   if (!promos.length) {
     promoUI.list.innerHTML =
@@ -1067,20 +1198,28 @@ function renderPromoCodes() {
     return;
   }
 
-  promoUI.list.innerHTML = promos
+  if (!shown.length) {
+    promoUI.list.innerHTML =
+      '<p class="empty">No offers match these filters.</p>';
+
+    return;
+  }
+
+  promoUI.list.innerHTML = shown
     .map(
       promo => `
       <article class="game-row">
-        <div class="thumb">${escapeHtml(promo.code.slice(0, 6).toUpperCase())}</div>
+        <div class="thumb">${escapeHtml((promo.code || "CODE").slice(0, 8).toUpperCase())}</div>
         <div class="game-info">
           <div class="game-meta">
-            <span class="badge">${promo.is_active ? "ACTIVE" : "HIDDEN"}</span>
+            <span class="badge ${promo.is_active ? "" : "hidden"}">${promo.is_active ? "VISIBLE" : "HIDDEN"}</span>
+            <span class="badge type">${promoTypeLabelAdmin(promo)}</span>
             ${
               promoIsExpired(promo)
-                ? '<span class="badge inactive">EXPIRED</span>'
+                ? '<span class="badge expired">EXPIRED</span>'
                 : ""
             }
-            ${escapeHtml(promo.game_name || "No game linked")}
+            ${escapeHtml(promo.game_name || promo.site_name || "No game linked")}
           </div>
           <h3>${escapeHtml(promo.code)}</h3>
           <p>${
@@ -1092,6 +1231,8 @@ function renderPromoCodes() {
           }</p>
         </div>
         <div class="row-actions">
+          <button class="toggle-button" type="button" data-promo-toggle="${promo.id}" title="${promo.is_active ? "Hide offer" : "Show offer"}">${promo.is_active ? "Hide" : "Show"}</button>
+          <button class="duplicate-button" type="button" data-promo-duplicate="${promo.id}" title="Duplicate this offer">Duplicate</button>
           <button class="edit-button" type="button" data-promo-edit="${promo.id}">Edit</button>
           <button class="delete-button" type="button" data-promo-delete="${promo.id}">Delete</button>
         </div>
@@ -1125,7 +1266,7 @@ async function loadPromoCodes() {
     if (promoUI.help) {
       promoUI.help.hidden = false;
       promoUI.help.innerHTML = missing
-        ? "The <strong>promo_codes</strong> table does not exist yet. Open Supabase, go to SQL Editor, run the file <code>supabase/promo_codes.sql</code> from this project, then press refresh."
+        ? "The <strong>promo_codes</strong> table does not exist yet. Open Supabase, go to SQL Editor, run <code>supabase/promo_codes.sql</code> and then <code>supabase/promo_codes_extra.sql</code> from this project, then press refresh."
         : `Could not load promo codes: ${escapeHtml(error.message)}`;
     }
 
@@ -1145,7 +1286,10 @@ function editPromo(id) {
 
   editingPromoId = id;
   promoUI.code.value = promo.code || "";
+  if (promoUI.type) promoUI.type.value = promo.promo_type || "code";
   promoUI.game.value = promo.game_id || "";
+  if (promoUI.site) promoUI.site.value = promo.site_name || "";
+  if (promoUI.download) promoUI.download.value = promo.download_url || "";
   promoUI.note.value = promo.note || "";
   promoUI.link.value = promo.link || "";
   promoUI.expires.value = promo.expires_at
@@ -1223,8 +1367,22 @@ async function savePromoCode(event) {
     expiresAt = parsed.toISOString();
   }
 
+  const download = promoUI.download?.value.trim() || "";
+
+  if (download) {
+    try {
+      new URL(download);
+    } catch {
+      promoNotice("Enter a valid download URL or leave it empty.", "error");
+      return;
+    }
+  }
+
   const payload = {
     code,
+    promo_type: promoUI.type?.value || "code",
+    site_name: promoUI.site?.value.trim() || null,
+    download_url: download || null,
     game_id: promoUI.game.value || null,
     game_name: promoUI.game.value
       ? promoUI.game.selectedOptions[0].textContent
@@ -1239,18 +1397,39 @@ async function savePromoCode(event) {
   setPromoBusy(true);
 
   try {
-    const query = editingPromoId
-      ? client.from("promo_codes").update(payload).eq("id", editingPromoId)
-      : client.from("promo_codes").insert(payload);
+    const send = withExtras => {
+      const body = { ...payload };
 
-    const { error } = await query;
+      if (!withExtras) {
+        delete body.promo_type;
+        delete body.site_name;
+        delete body.download_url;
+      }
+
+      return editingPromoId
+        ? client.from("promo_codes").update(body).eq("id", editingPromoId)
+        : client.from("promo_codes").insert(body);
+    };
+
+    let { error } = await send(true);
+    let extrasMissing = false;
+
+    if (
+      error &&
+      /promo_type|site_name|download_url|schema cache|column/i.test(error.message || "")
+    ) {
+      extrasMissing = true;
+      ({ error } = await send(false));
+    }
 
     if (error) throw new Error(error.message);
 
     promoNotice(
-      editingPromoId
-        ? "Promo code updated."
-        : "Promo code added and live on the site."
+      extrasMissing
+        ? "Promo code saved. Run supabase/promo_codes_extra.sql in Supabase to enable offer types, display sites and download buttons."
+        : editingPromoId
+          ? "Promo code updated."
+          : "Promo code added and live on the site."
     );
 
     resetPromoForm();
@@ -1272,15 +1451,87 @@ function initPromoCodesAdmin() {
   promoUI.cancel?.addEventListener("click", resetPromoForm);
   promoUI.refresh?.addEventListener("click", loadPromoCodes);
 
+  [promoUI.search, promoUI.typeFilter, promoUI.stateFilter].forEach(control => {
+    control?.addEventListener("input", renderPromoCodes);
+    control?.addEventListener("change", renderPromoCodes);
+  });
+
   promoUI.list?.addEventListener("click", event => {
     const editId = event.target.dataset.promoEdit;
     const deleteId = event.target.dataset.promoDelete;
+    const toggleId = event.target.dataset.promoToggle;
+    const duplicateId = event.target.dataset.promoDuplicate;
 
     if (editId) editPromo(editId);
     if (deleteId) deletePromo(deleteId);
+    if (toggleId) togglePromo(toggleId);
+    if (duplicateId) duplicatePromo(duplicateId);
   });
 
   loadPromoCodes();
+}
+
+/* =========================
+   PROMO QUICK ACTIONS
+========================= */
+
+async function togglePromo(id) {
+  const promo = promos.find(item => item.id === id);
+  if (!promo) return;
+
+  const next = !promo.is_active;
+
+  const { error } = await client
+    .from("promo_codes")
+    .update({ is_active: next })
+    .eq("id", id);
+
+  if (error) {
+    promoNotice(`Could not update the offer: ${error.message}`, "error");
+    return;
+  }
+
+  promoNotice(next ? "Offer is now visible on the site." : "Offer hidden from the site.");
+  await loadPromoCodes();
+}
+
+async function duplicatePromo(id) {
+  const promo = promos.find(item => item.id === id);
+  if (!promo) return;
+
+  const body = {
+    code: `${promo.code}-COPY`,
+    promo_type: promo.promo_type || "code",
+    site_name: promo.site_name || null,
+    download_url: promo.download_url || null,
+    game_id: promo.game_id || null,
+    game_name: promo.game_name || null,
+    note: promo.note || null,
+    link: promo.link || null,
+    expires_at: promo.expires_at || null,
+    is_active: false,
+    sort_order: (Number(promo.sort_order) || 0) + 1
+  };
+
+  let { error } = await client.from("promo_codes").insert(body);
+
+  if (
+    error &&
+    /promo_type|site_name|download_url|schema cache|column/i.test(error.message || "")
+  ) {
+    delete body.promo_type;
+    delete body.site_name;
+    delete body.download_url;
+    ({ error } = await client.from("promo_codes").insert(body));
+  }
+
+  if (error) {
+    promoNotice(`Could not duplicate the offer: ${error.message}`, "error");
+    return;
+  }
+
+  promoNotice("Offer duplicated as a hidden copy.");
+  await loadPromoCodes();
 }
 
 /* =========================

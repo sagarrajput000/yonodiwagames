@@ -198,6 +198,18 @@ function renderChrome() {
 
     if (headerSlot) {
         headerSlot.innerHTML = `
+            <div class="top-strip">
+                <div class="wrap">
+                    <span><b>18+</b> only · Play responsibly</span>
+                    <span class="strip-right">
+                        <span>Daily promo codes &amp; vouchers</span>
+                        <span class="dot" aria-hidden="true"></span>
+                        <a href="complaints.html">Complaint support</a>
+                        <span class="dot" aria-hidden="true"></span>
+                        <a href="mailto:${SITE.email}">${SITE.email}</a>
+                    </span>
+                </div>
+            </div>
             <header class="site-header">
                 <div class="header-inner">
                     <a class="brand" href="index.html" aria-label="${SITE.name} home">
@@ -397,21 +409,24 @@ function gameCard(game, options = {}) {
 }
 
 function spotCard(game, rank) {
+    const playable = canPlay(game);
     return `
-        <a class="spot-card" href="${gameHref(game)}">
+        <article class="spot-card">
             <div class="spot-head">
                 <span class="spot-logo">
                     ${game.image_url ? `<img src="${escapeHTML(game.image_url)}" alt="" loading="lazy" onerror="this.remove()">` : initials(game.name)}
                 </span>
                 <span class="spot-rank">#${rank} Top pick</span>
             </div>
-            <h3>${escapeHTML(game.name)}</h3>
+            <h3><a href="${gameHref(game)}">${escapeHTML(game.name)}</a></h3>
             <p>${escapeHTML(game.description || `${categoryLabel(game.category)} · editor score ${scoreFor(game)} of 10`)}</p>
             <div class="spot-foot">
                 <span class="score">${STAR_SVG}${scoreFor(game)}</span>
-                <span class="pill pill--cat">${categoryLabel(game.category)}</span>
+                ${playable
+                    ? `<a class="play-pill" href="${escapeAttr(game.game_url)}" target="_blank" rel="noopener noreferrer sponsored">Play</a>`
+                    : `<a class="play-pill" href="${gameHref(game)}" style="background:#6c757d">Details</a>`}
             </div>
-        </a>`;
+        </article>`;
 }
 
 function newsCover(article, className) {
@@ -482,46 +497,139 @@ function promoExpiryLabel(promo) {
     return `Ends in ${Math.max(minutes, 1)}m`;
 }
 
+const PROMO_TYPES = {
+    code: "Promocode",
+    deposit: "Deposit Voucher",
+    freegame: "Free Game Voucher"
+};
+
+function promoType(promo) {
+    const type = String(promo.promo_type || "code").toLowerCase();
+    return PROMO_TYPES[type] ? type : "code";
+}
+
+function promoTypeLabel(promo) {
+    return PROMO_TYPES[promoType(promo)];
+}
+
+function promoHost(promo) {
+    const raw = String(promo.site_name || promo.link || "").trim();
+    if (!raw) return "";
+    if (promo.site_name) return raw;
+    try {
+        return new URL(raw).hostname.replace(/^www\./, "");
+    } catch {
+        return "";
+    }
+}
+
+function promoExpiryStamp(promo) {
+    if (!promo.expires_at) return "";
+    const date = new Date(promo.expires_at);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+function promoTimerMarkup(promo) {
+    if (!promo.expires_at) return "";
+    return `<div class="promo-timer" data-expiry="${escapeAttr(promo.expires_at)}">
+        <span class="part" data-unit="days">00</span>
+        <span class="part" data-unit="hours">00</span>
+        <span class="part" data-unit="minutes">00</span>
+        <span class="part" data-unit="seconds">00</span>
+    </div>`;
+}
+
 function promoCard(promo) {
     const expired = promoExpired(promo);
     const game = promoGame(promo);
     const title = promo.game_name || (game ? game.name : "Promo code");
-    const href = game ? gameHref(game) : promo.link ? promo.link : "casinos.html";
-    const external = !game && Boolean(promo.link);
-    const cta = external
-        ? `<a class="btn btn-primary btn-sm" href="${escapeAttr(promo.link)}" target="_blank" rel="noopener noreferrer sponsored">Claim</a>`
-        : `<a class="btn btn-primary btn-sm" href="${href}">${game ? "View game" : "Browse games"}</a>`;
+    const host = promoHost(promo);
+    const logo = promo.logo_url || (game ? game.image_url : "");
+    const download = promo.download_url || "";
+    const actionHref = download || promo.link || (game ? gameHref(game) : "casinos.html");
+    const external = Boolean(download || promo.link);
+    const actionLabel = download
+        ? "Download Now"
+        : promo.link
+          ? "Claim offer"
+          : game
+            ? "View game"
+            : "Browse games";
+    const cta = `<a class="promo-download${download ? "" : " promo-download--ghost"}" href="${escapeAttr(actionHref)}"${external ? ' target="_blank" rel="noopener noreferrer sponsored"' : ""}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v10m0 0l-4-4m4 4l4-4"/><path d="M5 19h14"/></svg>
+            ${actionLabel}
+        </a>`;
 
     return `
         <article class="promo-card${expired ? " is-expired" : ""}">
             <div class="promo-head">
-                <span class="promo-game">${escapeHTML(title)}</span>
-                <span class="promo-state">${expired ? "Expired" : promo.expires_at ? "Limited" : "Live"}</span>
+                <div class="promo-title-wrap">
+                    <span class="promo-logo">
+                        ${logo ? `<img src="${escapeHTML(logo)}" alt="" loading="lazy" onerror="this.remove()">` : initials(title)}
+                    </span>
+                    <div>
+                        <span class="promo-game">${escapeHTML(title)}</span>
+                        <span class="promo-site">${escapeHTML(promoTypeLabel(promo))}${host ? ` · ${escapeHTML(host)}` : ""}</span>
+                    </div>
+                </div>
+                <span class="promo-state">${expired ? "Expired" : "Live"}</span>
             </div>
             <button class="promo-code" type="button" data-copy="${escapeAttr(promo.code)}" ${expired ? "disabled" : ""} aria-label="Copy code ${escapeAttr(promo.code)}">
                 <span class="promo-code-text">${escapeHTML(promo.code)}</span>
-                <span class="promo-copy">${expired ? "Ended" : "Copy"}</span>
+                <span class="promo-copy">${expired ? "Ended" : "Click to Copy"}</span>
             </button>
+            ${promoTimerMarkup(promo)}
             ${promo.note ? `<p class="promo-note">${escapeHTML(promo.note)}</p>` : ""}
+            ${cta}
             <div class="promo-foot">
-                <span class="promo-expiry" data-expiry="${escapeAttr(promo.expires_at || "")}">${promoExpiryLabel(promo)}</span>
-                ${cta}
+                <span class="promo-expiry">${promo.expires_at ? `Expire before<b>${escapeHTML(promoExpiryStamp(promo))}</b>` : promoExpiryLabel(promo)}</span>
             </div>
         </article>`;
 }
 
 function startPromoTimers(scope = document) {
-    scope.querySelectorAll("[data-expiry]").forEach(node => {
-        if (node.dataset.started === "1") return;
-        node.dataset.started = "1";
-        const card = node.closest(".promo-card");
-        const update = () => {
-            const label = promoExpiryLabel({ expires_at: node.dataset.expiry });
-            node.textContent = label;
-            if (label === "Expired" && card) card.classList.add("is-expired");
+    scope.querySelectorAll(".promo-timer[data-expiry]").forEach(timer => {
+        if (timer.dataset.started === "1") return;
+        timer.dataset.started = "1";
+
+        const expiry = new Date(timer.dataset.expiry).getTime();
+        const card = timer.closest(".promo-card");
+        const parts = {
+            days: timer.querySelector('[data-unit="days"]'),
+            hours: timer.querySelector('[data-unit="hours"]'),
+            minutes: timer.querySelector('[data-unit="minutes"]'),
+            seconds: timer.querySelector('[data-unit="seconds"]')
         };
-        update();
-        setInterval(update, 30000);
+
+        if (Number.isNaN(expiry) || Object.values(parts).some(part => !part)) {
+            timer.remove();
+            return;
+        }
+
+        const tick = () => {
+            const diff = expiry - Date.now();
+            if (diff <= 0) {
+                timer.classList.add("is-over");
+                timer.innerHTML = '<span class="ended">Offer expired</span>';
+                card?.classList.add("is-expired");
+                return;
+            }
+            const total = Math.floor(diff / 1000);
+            parts.days.textContent = String(Math.floor(total / 86400)).padStart(2, "0");
+            parts.hours.textContent = String(Math.floor((total % 86400) / 3600)).padStart(2, "0");
+            parts.minutes.textContent = String(Math.floor((total % 3600) / 60)).padStart(2, "0");
+            parts.seconds.textContent = String(total % 60).padStart(2, "0");
+            setTimeout(tick, 1000);
+        };
+
+        tick();
     });
 }
 
@@ -663,12 +771,27 @@ async function initHome() {
     }
 
     const promoGrid = document.getElementById("homePromos");
+    const promoTabs = document.getElementById("homePromoTabs");
     if (promoGrid) {
         const codes = await getPromoCodes();
-        promoGrid.innerHTML = codes.length
-            ? codes.slice(0, 3).map(promoCard).join("")
-            : '<p class="empty">No promo codes are live right now. New codes are posted here daily — check back soon.</p>';
-        startPromoTimers(promoGrid);
+        const paintPromos = type => {
+            const list = (type === "all" ? codes : codes.filter(promo => promoType(promo) === type)).slice(0, 6);
+            promoGrid.innerHTML = list.length
+                ? list.map(promoCard).join("")
+                : `<div class="empty-state">
+                        <h3>No offers in this category right now</h3>
+                        <p>New promo codes, deposit vouchers and free game vouchers are posted daily. Check back soon or browse the games directory.</p>
+                        <a class="btn btn-primary btn-sm" href="casinos.html">Browse games</a>
+                   </div>`;
+            startPromoTimers(promoGrid);
+        };
+        paintPromos("all");
+        promoTabs?.addEventListener("click", event => {
+            const tab = event.target.closest(".promo-tab");
+            if (!tab) return;
+            promoTabs.querySelectorAll(".promo-tab").forEach(item => item.classList.toggle("is-active", item === tab));
+            paintPromos(tab.dataset.promoType);
+        });
     }
 
     const searchForm = document.getElementById("heroSearch");
@@ -985,23 +1108,37 @@ async function initBonusesPage() {
 async function initPromoCodesPage() {
     const grid = document.getElementById("promoGrid");
     const count = document.getElementById("promoCount");
+    const tabs = document.getElementById("promoTabs");
     if (!grid) return;
 
     await getGames().catch(() => []);
     const codes = await getPromoCodes();
-    const live = codes.filter(promo => !promoExpired(promo));
 
-    if (count) count.textContent = String(live.length);
+    const paint = type => {
+        const list = type === "all" ? codes : codes.filter(promo => promoType(promo) === type);
+        const live = list.filter(promo => !promoExpired(promo));
 
-    grid.innerHTML = codes.length
-        ? codes.map(promoCard).join("")
-        : `<div class="empty-state">
-                <h3>No promo codes are live right now</h3>
-                <p>New codes are added from the admin panel every day. Check the bonuses page in the meantime, or come back shortly.</p>
-                <a class="btn btn-primary btn-sm" href="bonuses.html">Browse bonuses</a>
-           </div>`;
+        if (count) count.textContent = String(live.length);
 
-    startPromoTimers(grid);
+        grid.innerHTML = list.length
+            ? list.map(promoCard).join("")
+            : `<div class="empty-state">
+                    <h3>No ${type === "all" ? "promo codes" : PROMO_TYPES[type].toLowerCase() + "s"} live right now</h3>
+                    <p>New codes are added from the admin panel every day. Check the bonuses page in the meantime, or come back shortly.</p>
+                    <a class="btn btn-primary btn-sm" href="bonuses.html">Browse bonuses</a>
+               </div>`;
+
+        startPromoTimers(grid);
+    };
+
+    paint("all");
+
+    tabs?.addEventListener("click", event => {
+        const tab = event.target.closest(".promo-tab");
+        if (!tab) return;
+        tabs.querySelectorAll(".promo-tab").forEach(item => item.classList.toggle("is-active", item === tab));
+        paint(tab.dataset.promoType);
+    });
 }
 
 /* -------------------------------------------------------------- complaints */

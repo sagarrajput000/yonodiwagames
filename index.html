@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YonoDiwaGames — Yono and Diwa game directory with editor scores</title>
-    <meta name="description" content="Compare Yono and Diwa games in one directory. Editor scores, live and upcoming listings, bonuses, news and a free complaint service. 18+.">
+    <meta name="description" content="Compare Yono and Diwa games in one directory. Editor scores, live and upcoming listings, daily promo codes, bonuses, news and a free complaint service. 18+.">
     <link rel="icon" type="image/png" href="logo.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20261109">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="data.js" defer></script>
     <script src="app.js" defer></script>
@@ -17,11 +17,11 @@
 <main>
     <section class="hero">
         <div class="wrap hero-inner">
-            <span class="eyebrow">Independent game directory</span>
-            <h1>Find your game.<br>Then <span class="accent">play</span>.</h1>
+            <span class="eyebrow">India's trusted game directory</span>
+            <h1>Find your game.<br>Then <span class="accent">play</span> safe.</h1>
             <p class="lead">
-                Editor scores, live status and referral links for Yono and Diwa style gaming apps — checked,
-                organised and kept in one place so you can compare before you commit.
+                Editor scores, live status and verified referral links for Yono and Diwa style gaming apps —
+                checked, organised and kept in one place so you can compare before you commit.
             </p>
 
             <form class="hero-search" id="heroSearch" role="search">
@@ -37,10 +37,37 @@
                 <div><strong>—</strong><span>Diwa games</span></div>
                 <div><strong>—</strong><span>Coming soon</span></div>
             </div>
+
+            <nav class="quick-cats" aria-label="Browse the directory">
+                <a class="quick-cat" href="casinos.html">
+                    <span class="quick-cat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg></span>
+                    Casinos
+                </a>
+                <a class="quick-cat" href="bonuses.html">
+                    <span class="quick-cat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13M12 8S10.5 3 8 3a2.5 2.5 0 000 5M12 8s1.5-5 4-5a2.5 2.5 0 010 5"/></svg></span>
+                    Bonuses
+                </a>
+                <a class="quick-cat" href="news.html">
+                    <span class="quick-cat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 5h13v14H5a2 2 0 01-2-2V6a1 1 0 011-1z"/><path d="M17 9h3v8a2 2 0 01-2 2h-1M7 9h6M7 13h6M7 16h4"/></svg></span>
+                    News
+                </a>
+                <a class="quick-cat" href="promo-codes.html">
+                    <span class="quick-cat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0l-7.2-7.2a2 2 0 01-.6-1.4V4a1 1 0 011-1h8a2 2 0 011.4.6l7.4 7.4a2 2 0 010 2.4z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg></span>
+                    Promo codes
+                </a>
+                <a class="quick-cat" href="complaints.html">
+                    <span class="quick-cat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 21V4M5 4h11l-1.8 4L16 12H5"/></svg></span>
+                    Complaints
+                </a>
+                <a class="quick-cat" href="about.html">
+                    <span class="quick-cat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="7.8" r="1" fill="currentColor" stroke="none"/></svg></span>
+                    About
+                </a>
+            </nav>
         </div>
     </section>
 
-    <section class="section section--tight">
+    <section class="section section--tight section--recommend">
         <div class="wrap">
             <div class="section-head">
                 <div>
@@ -54,6 +81,30 @@
                 <div class="spot-card"><span class="spot-rank">Loading</span><h3>—</h3><p>Fetching the latest listings.</p></div>
                 <div class="spot-card"><span class="spot-rank">Loading</span><h3>—</h3><p>Fetching the latest listings.</p></div>
                 <div class="spot-card"><span class="spot-rank">Loading</span><h3>—</h3><p>Fetching the latest listings.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="promo-section" style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+        <div class="wrap">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Promo codes</span>
+                    <h2>Today's promo codes &amp; vouchers</h2>
+                    <p>Fresh codes posted daily. Tap a code to copy it, or use the download button, then paste the code at sign-up or in the offer box.</p>
+                </div>
+                <a class="view-all" href="promo-codes.html">All promo codes →</a>
+            </div>
+
+            <div class="promo-tabs" id="homePromoTabs" role="tablist" aria-label="Promo types">
+                <button class="promo-tab is-active" type="button" data-promo-type="all" role="tab">All offers</button>
+                <button class="promo-tab" type="button" data-promo-type="code" role="tab">Promocode</button>
+                <button class="promo-tab" type="button" data-promo-type="deposit" role="tab">Deposit Voucher</button>
+                <button class="promo-tab" type="button" data-promo-type="freegame" role="tab">Free Game Voucher</button>
+            </div>
+
+            <div class="promo-grid" id="homePromos">
+                <p class="loading">Loading promo codes</p>
             </div>
         </div>
     </section>
@@ -115,28 +166,12 @@
 
     <section class="section">
         <div class="wrap">
-            <div class="section-head">
-                <div>
-                    <span class="eyebrow">Promo codes</span>
-                    <h2>Today's promo codes</h2>
-                    <p>Fresh codes posted daily. Tap a code to copy it, then open the game and paste it at sign-up or in the offer box.</p>
-                </div>
-                <a class="view-all" href="promo-codes.html">All promo codes →</a>
-            </div>
-            <div class="promo-grid" id="homePromos">
-                <p class="loading">Loading promo codes</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="wrap">
             <div class="cta-band">
                 <div>
                     <h2>Something went wrong with a game?</h2>
                     <p>Use the complaint service. We record the case, contact the operator through our channel and follow up for up to 14 days — free of charge.</p>
                 </div>
-                <a class="btn btn-primary btn-lg" href="complaints.html">File a complaint</a>
+                <a class="btn btn-gold btn-lg" href="complaints.html">File a complaint</a>
             </div>
         </div>
     </section>
