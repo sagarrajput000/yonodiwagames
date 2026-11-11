@@ -8,6 +8,7 @@ const SUPABASE_KEY = "sb_publishable_f3UUErdVfU4o1WPj-FVM4Q_zvA2rr7w";
 
 const SITE = {
     name: "YonoDiwaGames",
+    url: "https://www.yonodiwagames.online",
     email: "support@yonodiwagames.online",
     instagram: "https://www.instagram.com/sagar_rajput_2678"
 };
@@ -90,6 +91,108 @@ function formatDate(value) {
 
 function params() {
     return new URLSearchParams(window.location.search);
+}
+
+function gameKey(name) {
+    return String(name || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+}
+
+function fallbackGameGuide(game) {
+    const collection = categoryLabel(game.category);
+    return {
+        title: `${game.name} — Score, Status & Link (2026) | ${SITE.name}`,
+        meta: `${game.name} in the ${SITE.name} directory: editor score, live status, listing notes and what to check before opening the referral link. 18+.`,
+        lead: `${game.name} is a ${collection.toLowerCase()} listing in the ${SITE.name} directory.`,
+        about: [
+            `${game.name} is part of the ${collection} collection tracked by ${SITE.name}. This page records the listing status, the editor score and the current referral link.`,
+            `We do not operate ${game.name}. Games, offers, deposits and withdrawals are handled by the operator, so confirm the current terms on their own site.`
+        ],
+        sections: [
+            {
+                title: `What the ${game.name} listing covers`,
+                body: [
+                    `The directory lists ${game.name} as a ${collection.toLowerCase()} app and keeps its status and score in one place. A listing score measures entry quality and link stability, not payouts or odds.`
+                ]
+            },
+            {
+                title: "Before you open the app",
+                body: [
+                    "Check the operator's domain, your local rules and the withdrawal terms before creating an account. 18+ only; play only where online gaming is legal."
+                ]
+            }
+        ],
+        faq: []
+    };
+}
+
+function gameGuide(game) {
+    const guides = window.GAME_GUIDES || {};
+    return guides[gameKey(game.name)] || fallbackGameGuide(game);
+}
+
+function setMetaTag(attribute, key, content) {
+    if (!content) return;
+    let tag = document.head.querySelector(`meta[${attribute}="${key}"]`);
+    if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute(attribute, key);
+        document.head.appendChild(tag);
+    }
+    tag.setAttribute("content", content);
+}
+
+function setCanonical(href) {
+    let tag = document.head.querySelector('link[rel="canonical"]');
+    if (!tag) {
+        tag = document.createElement("link");
+        tag.setAttribute("rel", "canonical");
+        document.head.appendChild(tag);
+    }
+    tag.setAttribute("href", href);
+}
+
+function setGameStructuredData(game, guide, pageUrl) {
+    document.querySelector('script[data-game-schema]')?.remove();
+
+    const graph = [
+        {
+            "@type": "WebPage",
+            "@id": `${pageUrl}#webpage`,
+            url: pageUrl,
+            name: document.title,
+            description: guide.meta,
+            isPartOf: { "@id": `${SITE.url}/#website` }
+        },
+        {
+            "@type": "BreadcrumbList",
+            itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/` },
+                { "@type": "ListItem", position: 2, name: "Games", item: `${SITE.url}/casinos.html` },
+                { "@type": "ListItem", position: 3, name: game.name, item: pageUrl }
+            ]
+        }
+    ];
+
+    if (guide.faq?.length) {
+        graph.push({
+            "@type": "FAQPage",
+            "@id": `${pageUrl}#faq`,
+            mainEntity: guide.faq.map(item => ({
+                "@type": "Question",
+                name: item.q,
+                acceptedAnswer: { "@type": "Answer", text: item.a }
+            }))
+        });
+    }
+
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.dataset.gameSchema = "true";
+    script.textContent = JSON.stringify({ "@context": "https://schema.org", "@graph": graph });
+    document.head.appendChild(script);
 }
 
 const STAR_SVG =
@@ -912,6 +1015,8 @@ async function initGameDetail() {
     const game = games.find(item => String(item.id) === String(id));
 
     if (!game) {
+        document.title = `Game not found | ${SITE.name}`;
+        setMetaTag("name", "robots", "noindex,follow");
         root.innerHTML = `
             <div class="panel" style="text-align:center;padding:60px 24px">
                 <h1 style="font-size:26px;margin-bottom:10px">Game not found</h1>
@@ -927,19 +1032,25 @@ async function initGameDetail() {
         .filter(item => item.id !== game.id && item.category === game.category)
         .slice(0, 4);
 
-    document.title = `${game.name} — score, details and link | ${SITE.name}`;
+    const guide = gameGuide(game);
+    const pageUrl = `${SITE.url}/casino.html?id=${encodeURIComponent(game.id)}`;
+
+    document.title = guide.title;
     const crumb = document.getElementById("crumbName");
     if (crumb) crumb.textContent = game.name;
     const heading = document.getElementById("detailTitle");
     if (heading) heading.textContent = game.name;
 
-    const meta = document.querySelector('meta[name="description"]');
-    if (meta) {
-        meta.setAttribute(
-            "content",
-            `${game.name} review on ${SITE.name}: editor score ${scoreFor(game)}/10, ${playable ? "live now" : "upcoming"}, ${categoryLabel(game.category)}. Check details before you play.`
-        );
-    }
+    setMetaTag("name", "description", guide.meta);
+    setMetaTag("property", "og:type", "website");
+    setMetaTag("property", "og:site_name", SITE.name);
+    setMetaTag("property", "og:title", guide.title);
+    setMetaTag("property", "og:description", guide.meta);
+    setMetaTag("property", "og:url", pageUrl);
+    setMetaTag("property", "og:image", game.image_url || `${SITE.url}/logo.png`);
+    setMetaTag("name", "twitter:card", "summary_large_image");
+    setCanonical(pageUrl);
+    setGameStructuredData(game, guide, pageUrl);
 
     root.innerHTML = `
         <div class="detail-grid">
@@ -956,16 +1067,36 @@ async function initGameDetail() {
                 <div class="panel" style="margin-top:18px">
                     <h2>About ${escapeHTML(game.name)}</h2>
                     <div class="prose">
-                        <p>${escapeHTML(
-                            game.description ||
-                                `${game.name} is part of the ${categoryLabel(game.category)} collection tracked by ${SITE.name}. Use the listing below to check what the app offers before you follow the referral link.`
-                        )}</p>
-                        <p>${escapeHTML(game.name)} currently scores <strong>${scoreFor(game)} / 10</strong> in our directory. Scores are based on how complete the listing is, how stable the link is, and how the app is received by the community — they are not a guarantee of payouts or returns.</p>
+                        <p><strong>${escapeHTML(guide.lead)}</strong></p>
+                        ${game.description ? `<p>${escapeHTML(game.description)}</p>` : ""}
+                        ${guide.about.map(paragraph => `<p>${escapeHTML(paragraph)}</p>`).join("")}
+                        ${guide.sections
+                            .map(
+                                section => `<h3>${escapeHTML(section.title)}</h3>${section.body
+                                    .map(paragraph => `<p>${paragraph}</p>`)
+                                    .join("")}`
+                            )
+                            .join("")}
                     </div>
                     <div class="note" style="margin-top:18px">
-                        ${SITE.name} does not operate this game. Bonuses, withdrawals and account support are handled by the operator of ${escapeHTML(game.name)}. Always confirm the terms on their own website.
+                        ${SITE.name} does not operate ${escapeHTML(game.name)}. Bonuses, withdrawals and account support are handled by the operator. Always confirm the terms on their own website. 18+ · Play responsibly.
                     </div>
                 </div>
+                ${guide.faq?.length
+                    ? `<div class="panel" style="margin-top:18px">
+                        <h2>${escapeHTML(game.name)} FAQ</h2>
+                        <div class="faq">
+                            ${guide.faq
+                                .map(
+                                    item => `<details class="faq-item">
+                                        <summary>${escapeHTML(item.q)}</summary>
+                                        <p>${escapeHTML(item.a)}</p>
+                                    </details>`
+                                )
+                                .join("")}
+                        </div>
+                    </div>`
+                    : ""}
             </div>
 
             <aside>
