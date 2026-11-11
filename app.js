@@ -74,7 +74,8 @@ function categoryLabel(category) {
 }
 
 function gameHref(game) {
-    return `casino.html?id=${encodeURIComponent(game.id)}`;
+    const staticPage = (window.GAME_PAGES || {})[gameKey(game.name)];
+    return staticPage || `casino.html?id=${encodeURIComponent(game.id)}`;
 }
 
 function formatDate(value) {
@@ -1004,7 +1005,7 @@ async function initGamesPage() {
 
 async function initGameDetail() {
     const root = document.getElementById("gameDetail");
-    if (!root) return;
+    if (!root || document.body.dataset.staticGame === "true") return;
 
     const id = params().get("id");
     const games = await getGames().catch(error => {
@@ -1033,7 +1034,10 @@ async function initGameDetail() {
         .slice(0, 4);
 
     const guide = gameGuide(game);
-    const pageUrl = `${SITE.url}/casino.html?id=${encodeURIComponent(game.id)}`;
+    const staticPage = (window.GAME_PAGES || {})[gameKey(game.name)];
+    const pageUrl = staticPage
+        ? `${SITE.url}/${staticPage}`
+        : `${SITE.url}/casino.html?id=${encodeURIComponent(game.id)}`;
 
     document.title = guide.title;
     const crumb = document.getElementById("crumbName");

@@ -4,6 +4,28 @@
    exact game name in the Supabase "games" table.
    ========================================================================== */
 
+/* Static game guide URLs. Keys use the game name lowercased with punctuation
+   and extra spaces removed. app.js falls back to casino.html?id= if a game is
+   not listed here yet. */
+window.GAME_PAGES = {
+    "diwa play": "diwa-play.html",
+    "diwa x": "diwa-x.html",
+    "diwa top": "diwa-top.html",
+    "mqm bet": "mqm-bet.html",
+    "diwa king": "diwa-king.html",
+    "rummy zip": "rummy-zip.html",
+    "777 game": "777-game.html",
+    "bingo 101": "bingo-101.html",
+    "567 slots": "567-slots.html",
+    "boss rummy": "boss-rummy.html",
+    "yono arcade": "yono-arcade.html",
+    "yono slots": "yono-slots.html",
+    "ind slots": "ind-slots.html",
+    "diwa lucky": "diwa-lucky.html",
+    "diwa win": "diwa-win.html",
+    "diwa ace": "diwa-ace.html"
+};
+
 window.SITE_NEWS = [
     {
         slug: "how-we-score-games",
